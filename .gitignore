@@ -28,3 +28,20 @@ gradle.properties
 
 # Logs
 *.log
+
+# sample App
+app/.gradle
+app/**/build/
+app/local.properties
+
+# IDE
+app/.idea/
+app/*.iml
+app/.kotlin/
+
+app/.DS_Store
+app/**/.DS_Store
+app/Thumbs.db
+
+app/**/ios/Pods/
+app/**/ios/Podfile.lock
