@@ -1,4 +1,4 @@
-package com.ferret.app
+package com.ferret.app.home
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -6,10 +6,12 @@ import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -28,6 +31,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -35,18 +39,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ferret.app.components.AnimatedArticleCard
 import com.ferret.app.components.CategoryChipItem
 import com.ferret.app.components.FeaturedBannerCard
 import com.ferret.app.components.rememberSmoothFlingBehavior
-import com.ferret.app.model.sampleArticles
-import com.ferret.app.model.sampleChips
+import com.ferret.app.model.ALL_CATEGORY
+import com.ferret.app.model.categoryChips
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun App() {
+fun App(
+    viewModel: AppViewModel = koinViewModel()
+) {
+    val state by viewModel.appUiState.collectAsStateWithLifecycle()
+    AppContent(state = state)
+}
+
+@Composable
+fun AppContent(
+    state: AppUiState
+) {
 
     val listState = rememberLazyListState()
-    val selectedChip = remember { mutableStateOf("All") }
+    val selectedChip = remember { mutableStateOf(ALL_CATEGORY) }
 
     // Derive scroll offset for top-bar elevation animation
     val isScrolled by remember {
@@ -58,9 +74,10 @@ fun App() {
         label = "topBarElevation"
     )
 
-    val filteredArticles = remember(selectedChip.value) {
-        if (selectedChip.value == "All") sampleArticles
-        else sampleArticles.filter { it.category == selectedChip.value }
+    val articles = state.success.orEmpty()
+    val filteredArticles = remember(selectedChip.value, articles) {
+        if (selectedChip.value == ALL_CATEGORY) articles
+        else articles.filter { it.topic == selectedChip.value }
     }
 
     val smoothFling = rememberSmoothFlingBehavior()
@@ -103,7 +120,7 @@ fun App() {
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        sampleChips.forEach { chip ->
+                        categoryChips.forEach { chip ->
                             CategoryChipItem(
                                 chip = chip,
                                 selected = selectedChip.value == chip.label,
@@ -117,44 +134,64 @@ fun App() {
         },
         containerColor = Color(0xFFF0F2F5)
     ) { padding ->
-        // Disable the Android edge-glow overscroll effect — it fights the fling
-        // and makes scrolling feel jerky on fast swipes.
-        CompositionLocalProvider(LocalOverscrollFactory provides null) {
-            LazyColumn(
-                state = listState,
-                flingBehavior = smoothFling,
-                contentPadding = PaddingValues(
-                    top = padding.calculateTopPadding() + 12.dp,
-                    bottom = 32.dp,
-                    start = 16.dp,
-                    end = 16.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                // Featured header card
-                item(key = "header") {
-                    FeaturedBannerCard()
+        when {
+            state.isLoading && articles.isEmpty() -> {
+                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Color(0xFF6C63FF))
                 }
+            }
 
-                // Section label
-                item(key = "section_label") {
+            state.error != null && articles.isEmpty() -> {
+                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "${filteredArticles.size} Articles",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            color = Color(0xFF6B7280),
-                            fontWeight = FontWeight.SemiBold,
-                            letterSpacing = 0.5.sp
-                        ),
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                        text = state.error,
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF6B7280)),
+                        modifier = Modifier.padding(horizontal = 32.dp)
                     )
                 }
+            }
 
-                // Animated article cards
-                itemsIndexed(
-                    items = filteredArticles,
-                    key = { _, article -> article.id }
-                ) { index, article ->
-                    AnimatedArticleCard(article = article, index = index)
+            else -> {
+                // Disable the Android edge-glow overscroll effect — it fights the fling
+                // and makes scrolling feel jerky on fast swipes.
+                CompositionLocalProvider(LocalOverscrollFactory provides null) {
+                    LazyColumn(
+                        state = listState,
+                        flingBehavior = smoothFling,
+                        contentPadding = PaddingValues(
+                            top = padding.calculateTopPadding() + 12.dp,
+                            bottom = 32.dp,
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        // Featured header card
+                        item(key = "header") {
+                            FeaturedBannerCard()
+                        }
+
+                        // Section label
+                        item(key = "section_label") {
+                            Text(
+                                text = "${filteredArticles.size} Articles",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    color = Color(0xFF6B7280),
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = 0.5.sp
+                                ),
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                            )
+                        }
+
+                        // Animated article cards
+                        itemsIndexed(
+                            items = filteredArticles,
+                            key = { _, article -> article.id }
+                        ) { index, article ->
+                            AnimatedArticleCard(article = article, index = index)
+                        }
+                    }
                 }
             }
         }
@@ -164,5 +201,5 @@ fun App() {
 @Preview
 @Composable
 fun AppPreview() {
-    App()
+    AppContent(state = AppUiState())
 }

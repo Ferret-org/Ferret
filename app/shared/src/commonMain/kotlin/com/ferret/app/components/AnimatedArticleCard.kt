@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ferret.app.model.Article
 import kotlinx.coroutines.delay
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
-
 
 @Composable
 fun AnimatedArticleCard(
@@ -75,6 +74,8 @@ fun AnimatedArticleCard(
         label = "cardScale"
     )
 
+    val accentColor = remember(article.topic) { colorForTopic(article.topic) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,46 +99,44 @@ fun AnimatedArticleCard(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Accent color bar + category icon
+            // Real network avatar (Coil3 AsyncImage — works on Android + iOS)
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(46.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(article.accentColor.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Icons.Default.Star ships in core material-icons — safe for KMP/iOS
-
-                }
+//                AsyncImage(
+//                    model = article.image,
+//                    contentDescription = "${article.author} avatar",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .size(46.dp)
+//                        .clip(RoundedCornerShape(12.dp))
+//                        .background(accentColor.copy(alpha = 0.12f))
+//                )
                 Box(
                     modifier = Modifier
                         .width(3.dp)
                         .height(50.dp)
                         .clip(CircleShape)
-                        .background(article.accentColor.copy(alpha = 0.3f))
+                        .background(accentColor.copy(alpha = 0.3f))
                 )
             }
 
-            // Text content
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Category tag
+                // Topic tag
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(article.accentColor.copy(alpha = 0.1f))
+                        .background(accentColor.copy(alpha = 0.1f))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = article.category.uppercase(),
+                        text = "${emojiForTopic(article.topic)} ${article.topic.uppercase()}",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = article.accentColor,
+                            color = accentColor,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 0.8.sp
                         )
@@ -156,7 +155,7 @@ fun AnimatedArticleCard(
                 )
 
                 Text(
-                    text = article.subtitle,
+                    text = article.desc,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Color(0xFF6B7280),
                         lineHeight = 17.sp
@@ -167,28 +166,11 @@ fun AnimatedArticleCard(
 
                 Spacer(Modifier.height(4.dp))
 
-                // Author + meta row
+                // Author + relative time row
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Author avatar placeholder
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clip(CircleShape)
-                            .background(article.accentColor),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = article.author.first().toString(),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 9.sp
-                            )
-                        )
-                    }
                     Text(
                         text = article.author,
                         style = MaterialTheme.typography.labelSmall.copy(
@@ -199,14 +181,10 @@ fun AnimatedArticleCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-
+                    val now = remember { Clock.System.now().toEpochMilliseconds() }
                     Text(
-                        text = "❤ ${article.likes}",
-                        style = MaterialTheme.typography.labelSmall.copy(color = Color(0xFF6B7280))
-                    )
-                    Text(
-                        text = "⏱ ${article.readTimeMinutes}m",
-                        style = MaterialTheme.typography.labelSmall.copy(color = Color(0xFF6B7280))
+                        text = timeAgo(article.createdAt, now),
+                        style = MaterialTheme.typography.labelSmall.copy(color = Color(0xFF9CA3AF))
                     )
                 }
             }
