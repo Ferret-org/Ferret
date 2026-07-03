@@ -24,9 +24,11 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
+        mavenLocal()
         mavenCentral()
     }
 }
 
 include(":androidApp")
 include(":shared")
+

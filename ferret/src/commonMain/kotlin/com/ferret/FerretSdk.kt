@@ -1,5 +1,10 @@
 package com.ferret
 
+import com.ferret.notification.NotificationKit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 object FerretSdk {
 
@@ -16,6 +21,19 @@ object FerretSdk {
             context,
             configuration
         )
+
+        NotificationKit.push {
+            title("Ferret")
+            message("Welcome")
+        }
+        repository?.transactionRepository?.let {
+            CoroutineScope(Dispatchers.Default).launch {
+                DatabaseTester.run(
+                    it
+                )
+            }
+        }
+
     }
 }
 

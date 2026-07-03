@@ -8,19 +8,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.ferret.app.home.App
 import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
-import com.ferret.FerretConfiguration
-import com.ferret.FerretSdk
-import com.ferret.notification.NotificationChannelSpec
-import com.ferret.notification.NotificationKit
-import com.ferret.notification.NotificationPriority
-import kotlinx.coroutines.delay
+import util.initApplicationContext
 
 class MainActivity : ComponentActivity() {
 
@@ -34,8 +27,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
-        FerretSdk.initialize(applicationContext)
+        initApplicationContext(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -50,22 +42,6 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val pushing by canPush
-
-            if (pushing) {
-                LaunchedEffect(Unit) {
-                    var count = 1
-                    while (true) {
-                        NotificationKit.push {
-                            title("GET /api/data")
-                            message("200 OK — ${count * 120}ms")
-                        }
-                        count++
-                        delay(3_000)
-                    }
-                }
-            }
-
             App()
         }
     }

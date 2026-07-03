@@ -14,7 +14,6 @@ kotlin {
 
 dependencies {
     implementation(projects.shared)
-    implementation(projects.ferretLib)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
