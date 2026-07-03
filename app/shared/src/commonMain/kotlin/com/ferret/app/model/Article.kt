@@ -1,14 +1,15 @@
 package com.ferret.app.model
 
-import androidx.compose.ui.graphics.Color
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Article(
-    val id: Int,
+    val id: String,
     val title: String,
-    val subtitle: String,
+    val image: String,
     val author: String,
-    val category: String,
-    val readTimeMinutes: Int,
-    val likes: Int,
-    val accentColor: Color
+    val desc: String,
+    val topic: String,
+    @SerialName("createdAt") val createdAt: String
 )

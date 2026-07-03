@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
+import com.ferret.app.home.App
 import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
 import com.ferret.FerretConfiguration
