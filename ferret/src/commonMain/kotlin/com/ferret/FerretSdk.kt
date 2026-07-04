@@ -1,43 +1,15 @@
 package com.ferret
 
-import com.ferret.notification.NotificationKit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
+import com.ferret.repository.TransactionRepository
 
 object FerretSdk {
 
-    private var repository: FerretRepository? = null
-    fun initialize(
-        context: Any,
-        configuration: FerretConfiguration = FerretConfiguration()
-    ) {
-        if (repository != null) {
-            error("FerretSdk has already been initialized.")
-        }
+    internal var repository: FerretRepository? = null
 
-        repository = createRepository(
-            context,
-            configuration
-        )
-
-        NotificationKit.push {
-            title("Ferret")
-            message("Welcome")
-        }
-        repository?.transactionRepository?.let {
-            CoroutineScope(Dispatchers.Default).launch {
-                DatabaseTester.run(
-                    it
-                )
-            }
-        }
-
-    }
+    val transactionRepository: TransactionRepository?
+        get() = repository?.transactionRepository
 }
 
 internal expect fun createRepository(
-    context: Any,
     configuration: FerretConfiguration
 ): FerretRepository
