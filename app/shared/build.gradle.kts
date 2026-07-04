@@ -66,13 +66,15 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktorfit.lib)
 
-            // Koin dependency injection (Compose Multiplatform)
+//             Koin dependency injection (Compose Multiplatform)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.core.viewmodel)
 
             implementation(libs.kermit.logging)
+
+            implementation("com.ferret:ferret-lib:0.1.0-LOCAL")
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
