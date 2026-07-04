@@ -1,3 +1,7 @@
+rootProject.name = "Ferret"
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         google()
@@ -9,10 +13,11 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         google()
-        mavenCentral {}
+        mavenCentral()
         maven("https://dl.google.com/dl/android/maven2/")
     }
 }
 
-rootProject.name = "ferret"
-include(":ferret")
+
+include(":ferret-lib")
+project(":ferret-lib").projectDir = file("ferret")

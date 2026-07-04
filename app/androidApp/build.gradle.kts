@@ -11,10 +11,12 @@ kotlin {
         jvmTarget = JvmTarget.JVM_11
     }
 }
+
 dependencies {
     implementation(projects.shared)
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.ktx)
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
