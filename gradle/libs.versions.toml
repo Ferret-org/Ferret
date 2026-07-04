@@ -6,10 +6,13 @@ android-compileSdk = "37"
 kotlinxCoroutinesCore = "1.11.0"
 lifecycleProcess = "2.11.0"
 vanniktech = "0.37.0"
+ktorVersion = "3.5.1"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorVersion" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktorVersion" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

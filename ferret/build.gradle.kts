@@ -23,10 +23,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-
+            implementation(libs.ktor.client.core)
         }
         androidMain.dependencies {
-
+            implementation(libs.ktor.client.okhttp)
         }
     }
 }
