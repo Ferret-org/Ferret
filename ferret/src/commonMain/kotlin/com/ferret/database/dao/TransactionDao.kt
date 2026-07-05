@@ -21,32 +21,73 @@ interface TransactionDao {
     suspend fun delete(entity: TransactionEntity)
 
     @Query("""
-        SELECT *
-        FROM transactions
-        ORDER BY startTimestamp DESC
+        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SET responseDate         = :responseDate,
+            tookMs               = :tookMs,
+            responseCode         = :responseCode,
+            responseMessage      = :responseMessage,
+            responsePayloadSize  = :responsePayloadSize,
+            responseContentType  = :responseContentType,
+            responseHeaders      = :responseHeaders,
+            responseHeadersSize  = :responseHeadersSize,
+            responseBody         = :responseBody,
+            responseTlsVersion   = :responseTlsVersion,
+            responseCipherSuite  = :responseCipherSuite
+        WHERE sessionId = :sessionId
+    """)
+    suspend fun updateResponse(
+        sessionId: String,
+        responseDate: Long,
+        tookMs: Long,
+        responseCode: Int,
+        responseMessage: String,
+        responsePayloadSize: Long,
+        responseContentType: String?,
+        responseHeaders: String,
+        responseHeadersSize: Int,
+        responseBody: String?,
+        responseTlsVersion: String?,
+        responseCipherSuite: String?,
+    )
+
+    @Query("""
+        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SET responseDate = :responseDate,
+            tookMs       = :tookMs,
+            error        = :error
+        WHERE sessionId = :sessionId
+    """)
+    suspend fun updateError(
+        sessionId: String,
+        responseDate: Long,
+        tookMs: Long,
+        error: String?,
+    )
+
+    @Query("""
+        SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        ORDER BY requestDate DESC
     """)
     fun observeAll(): Flow<List<TransactionEntity>>
 
     @Query("""
-        SELECT *
-        FROM transactions
+        SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
         WHERE id = :id
     """)
     suspend fun getById(id: Long): TransactionEntity?
 
     @Query("""
-        SELECT *
-        FROM transactions
-        ORDER BY startTimestamp DESC
+        SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        ORDER BY requestDate DESC
     """)
     suspend fun getAll(): List<TransactionEntity>
 
-    @Query("DELETE FROM transactions")
+    @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}")
     suspend fun clear()
 
     @Query("""
-        DELETE FROM transactions
-        WHERE startTimestamp < :timestamp
+        DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        WHERE requestDate < :timestamp
     """)
     suspend fun deleteOlderThan(timestamp: Long)
 }

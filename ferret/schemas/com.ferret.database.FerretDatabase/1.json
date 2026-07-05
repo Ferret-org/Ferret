@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "91da614ad7f6784b0e7698fad19d287a",
+    "identityHash": "0c4483a657c5c1859721e8fbbc6a1406",
     "entities": [
       {
         "tableName": "transactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` TEXT NOT NULL, `protocol` TEXT NOT NULL, `state` TEXT NOT NULL, `url` TEXT NOT NULL, `method` TEXT, `requestHeaders` TEXT NOT NULL, `responseHeaders` TEXT NOT NULL, `requestBody` TEXT, `responseBody` TEXT, `statusCode` INTEGER, `startTimestamp` INTEGER NOT NULL, `endTimestamp` INTEGER, `durationMs` INTEGER, `isSecure` INTEGER NOT NULL, `errorMessage` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` TEXT NOT NULL, `requestDate` INTEGER NOT NULL, `responseDate` INTEGER, `tookMs` INTEGER, `protocol` TEXT NOT NULL, `method` TEXT, `url` TEXT NOT NULL, `host` TEXT NOT NULL, `path` TEXT NOT NULL, `scheme` TEXT NOT NULL, `responseTlsVersion` TEXT, `responseCipherSuite` TEXT, `requestPayloadSize` INTEGER NOT NULL, `requestContentType` TEXT, `requestHeaders` TEXT NOT NULL, `requestHeadersSize` INTEGER NOT NULL, `requestBody` TEXT, `isRequestBodyEncoded` INTEGER NOT NULL, `responseCode` INTEGER, `responseMessage` TEXT, `error` TEXT, `responsePayloadSize` INTEGER NOT NULL, `responseContentType` TEXT, `responseHeaders` TEXT NOT NULL, `responseHeadersSize` INTEGER NOT NULL, `responseBody` TEXT, `isResponseBodyEncoded` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -21,20 +21,24 @@
             "notNull": true
           },
           {
+            "fieldPath": "requestDate",
+            "columnName": "requestDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "responseDate",
+            "columnName": "responseDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tookMs",
+            "columnName": "tookMs",
+            "affinity": "INTEGER"
+          },
+          {
             "fieldPath": "protocol",
             "columnName": "protocol",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "state",
-            "columnName": "state",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "url",
-            "columnName": "url",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -44,15 +48,60 @@
             "affinity": "TEXT"
           },
           {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "host",
+            "columnName": "host",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scheme",
+            "columnName": "scheme",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "responseTlsVersion",
+            "columnName": "responseTlsVersion",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "responseCipherSuite",
+            "columnName": "responseCipherSuite",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "requestPayloadSize",
+            "columnName": "requestPayloadSize",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "requestContentType",
+            "columnName": "requestContentType",
+            "affinity": "TEXT"
+          },
+          {
             "fieldPath": "requestHeaders",
             "columnName": "requestHeaders",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "responseHeaders",
-            "columnName": "responseHeaders",
-            "affinity": "TEXT",
+            "fieldPath": "requestHeadersSize",
+            "columnName": "requestHeadersSize",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -61,41 +110,59 @@
             "affinity": "TEXT"
           },
           {
+            "fieldPath": "isRequestBodyEncoded",
+            "columnName": "isRequestBodyEncoded",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "responseCode",
+            "columnName": "responseCode",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "responseMessage",
+            "columnName": "responseMessage",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "error",
+            "columnName": "error",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "responsePayloadSize",
+            "columnName": "responsePayloadSize",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "responseContentType",
+            "columnName": "responseContentType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "responseHeaders",
+            "columnName": "responseHeaders",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "responseHeadersSize",
+            "columnName": "responseHeadersSize",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "responseBody",
             "columnName": "responseBody",
             "affinity": "TEXT"
           },
           {
-            "fieldPath": "statusCode",
-            "columnName": "statusCode",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "startTimestamp",
-            "columnName": "startTimestamp",
+            "fieldPath": "isResponseBodyEncoded",
+            "columnName": "isResponseBodyEncoded",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "endTimestamp",
-            "columnName": "endTimestamp",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "durationMs",
-            "columnName": "durationMs",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "isSecure",
-            "columnName": "isSecure",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "errorMessage",
-            "columnName": "errorMessage",
-            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -107,46 +174,37 @@
         "indices": [
           {
             "name": "index_transactions_sessionId",
-            "unique": false,
+            "unique": true,
             "columnNames": [
               "sessionId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_transactions_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
           },
           {
-            "name": "index_transactions_protocol",
+            "name": "index_transactions_requestDate",
             "unique": false,
             "columnNames": [
-              "protocol"
+              "requestDate"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_protocol` ON `${TABLE_NAME}` (`protocol`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_requestDate` ON `${TABLE_NAME}` (`requestDate`)"
           },
           {
-            "name": "index_transactions_state",
+            "name": "index_transactions_responseCode",
             "unique": false,
             "columnNames": [
-              "state"
+              "responseCode"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_state` ON `${TABLE_NAME}` (`state`)"
-          },
-          {
-            "name": "index_transactions_startTimestamp",
-            "unique": false,
-            "columnNames": [
-              "startTimestamp"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_startTimestamp` ON `${TABLE_NAME}` (`startTimestamp`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_responseCode` ON `${TABLE_NAME}` (`responseCode`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '91da614ad7f6784b0e7698fad19d287a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0c4483a657c5c1859721e8fbbc6a1406')"
     ]
   }
 }

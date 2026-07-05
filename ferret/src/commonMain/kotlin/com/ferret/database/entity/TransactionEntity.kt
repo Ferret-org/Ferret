@@ -4,19 +4,14 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ferret.database.DatabaseConstants
-import com.ferret.model.Body
 import com.ferret.model.Header
-import com.ferret.model.HttpMethod
-import com.ferret.model.TransactionProtocol
-import com.ferret.model.TransactionState
 
 @Entity(
     tableName = DatabaseConstants.TRANSACTIONS_TABLE,
     indices = [
-        Index("sessionId"),
-        Index("protocol"),
-        Index("state"),
-        Index("startTimestamp")
+        Index("sessionId", unique = true),
+        Index("requestDate"),
+        Index("responseCode"),
     ]
 )
 data class TransactionEntity(
@@ -26,31 +21,55 @@ data class TransactionEntity(
 
     val sessionId: String,
 
-    val protocol: TransactionProtocol,
+    val requestDate: Long,
 
-    val state: TransactionState,
+    val responseDate: Long? = null,
+
+    val tookMs: Long? = null,
+
+    val protocol: String,
+
+    val method: String?,
 
     val url: String,
 
-    val method: HttpMethod?,
+    val host: String,
 
-    val requestHeaders: List<Header>,
+    val path: String,
 
-    val responseHeaders: List<Header>,
+    val scheme: String,
 
-    val requestBody: Body?,
+    val responseTlsVersion: String? = null,
 
-    val responseBody: Body?,
+    val responseCipherSuite: String? = null,
 
-    val statusCode: Int?,
+    val requestPayloadSize: Long = 0,
 
-    val startTimestamp: Long,
+    val requestContentType: String? = null,
 
-    val endTimestamp: Long?,
+    val requestHeaders: List<Header> = emptyList(),
 
-    val durationMs: Long?,
+    val requestHeadersSize: Int = 0,
 
-    val isSecure: Boolean,
+    val requestBody: String? = null,
 
-    val errorMessage: String?
+    val isRequestBodyEncoded: Boolean = false,
+
+    val responseCode: Int? = null,
+
+    val responseMessage: String? = null,
+
+    val error: String? = null,
+
+    val responsePayloadSize: Long = 0,
+
+    val responseContentType: String? = null,
+
+    val responseHeaders: List<Header> = emptyList(),
+
+    val responseHeadersSize: Int = 0,
+
+    val responseBody: String? = null,
+
+    val isResponseBodyEncoded: Boolean = false,
 )

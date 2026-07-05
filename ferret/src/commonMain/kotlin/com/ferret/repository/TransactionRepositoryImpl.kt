@@ -18,6 +18,46 @@ internal class TransactionRepositoryImpl(
     override suspend fun update(transaction: Transaction) =
         dao.update(transaction.toEntity())
 
+    override suspend fun updateResponse(
+        sessionId: String,
+        responseDate: Long,
+        tookMs: Long,
+        responseCode: Int,
+        responseMessage: String,
+        responsePayloadSize: Long,
+        responseContentType: String?,
+        responseHeaders: String,
+        responseHeadersSize: Int,
+        responseBody: String?,
+        responseTlsVersion: String?,
+        responseCipherSuite: String?,
+    ) = dao.updateResponse(
+        sessionId = sessionId,
+        responseDate = responseDate,
+        tookMs = tookMs,
+        responseCode = responseCode,
+        responseMessage = responseMessage,
+        responsePayloadSize = responsePayloadSize,
+        responseContentType = responseContentType,
+        responseHeaders = responseHeaders,
+        responseHeadersSize = responseHeadersSize,
+        responseBody = responseBody,
+        responseTlsVersion = responseTlsVersion,
+        responseCipherSuite = responseCipherSuite,
+    )
+
+    override suspend fun updateError(
+        sessionId: String,
+        responseDate: Long,
+        tookMs: Long,
+        error: String?,
+    ) = dao.updateError(
+        sessionId = sessionId,
+        responseDate = responseDate,
+        tookMs = tookMs,
+        error = error,
+    )
+
     override suspend fun delete(transaction: Transaction) =
         dao.delete(transaction.toEntity())
 
@@ -31,9 +71,7 @@ internal class TransactionRepositoryImpl(
         dao.getAll().map(TransactionEntity::toDomain)
 
     override fun observeAll(): Flow<List<Transaction>> =
-        dao.observeAll().map { list ->
-            list.map(TransactionEntity::toDomain)
-        }
+        dao.observeAll().map { list -> list.map(TransactionEntity::toDomain) }
 
     override suspend fun deleteOlderThan(timestamp: Long) =
         dao.deleteOlderThan(timestamp)
