@@ -12,6 +12,7 @@ import com.ferret.model.Header
         Index("sessionId", unique = true),
         Index("requestDate"),
         Index("responseCode"),
+        Index("protocol")
     ]
 )
 data class TransactionEntity(
