@@ -30,7 +30,6 @@ kotlin {
         }
     }
 
-
     sourceSets {
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -43,6 +42,7 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
         }
 
         androidMain.dependencies {
@@ -50,6 +50,7 @@ kotlin {
             implementation(libs.androidx.appcompat)
             implementation(libs.core)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
         }
     }
 }

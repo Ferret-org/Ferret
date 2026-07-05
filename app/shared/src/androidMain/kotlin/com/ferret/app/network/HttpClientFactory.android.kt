@@ -1,7 +1,6 @@
 package com.ferret.app.network
 
-import android.content.Context
-import com.ferret.FerretSdk
+import com.ferret.intercept.FerretInterceptor
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.serialization.json.Json
@@ -21,8 +20,7 @@ actual fun createHttpClient(json: Json): HttpClient = HttpClient(OkHttp) {
                 )
             )
         }
+        addInterceptor(FerretInterceptor(context = applicationContext))
     }
     configureShared(json)
-
-    FerretSdk.initialize(context = applicationContext)
 }

@@ -6,31 +6,55 @@ data class Transaction(
 
     val sessionId: String,
 
-    val protocol: TransactionProtocol,
+    val requestDate: Long,
 
-    val state: TransactionState,
+    val responseDate: Long? = null,
+
+    val tookMs: Long? = null,
+
+    val protocol: String,
+
+    val method: String?,
 
     val url: String,
 
-    val method: HttpMethod?,
+    val host: String,
+
+    val path: String,
+
+    val scheme: String,
+
+    val responseTlsVersion: String? = null,
+
+    val responseCipherSuite: String? = null,
+
+    val requestPayloadSize: Long = 0,
+
+    val requestContentType: String? = null,
 
     val requestHeaders: List<Header> = emptyList(),
 
+    val requestHeadersSize: Int = 0,
+
+    val requestBody: String? = null,
+
+    val isRequestBodyEncoded: Boolean = false,
+
+    val responseCode: Int? = null,
+
+    val responseMessage: String? = null,
+
+    val error: String? = null,
+
+    val responsePayloadSize: Long = 0,
+
+    val responseContentType: String? = null,
+
     val responseHeaders: List<Header> = emptyList(),
 
-    val requestBody: Body? = null,
+    val responseHeadersSize: Int = 0,
 
-    val responseBody: Body? = null,
+    val responseBody: String? = null,
 
-    val statusCode: Int? = null,
-
-    val startTimestamp: Long,
-
-    val endTimestamp: Long? = null,
-
-    val durationMs: Long? = null,
-
-    val isSecure: Boolean,
-
-    val errorMessage: String? = null
+    val isResponseBodyEncoded: Boolean = false,
 )

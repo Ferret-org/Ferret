@@ -11,9 +11,7 @@ import platform.Foundation.NSUserDomainMask
 internal actual object DatabaseFactory {
 
     @OptIn(ExperimentalForeignApi::class)
-    actual fun createDatabase(
-        context: Any
-    ): FerretDatabase {
+    actual fun createDatabase(): FerretDatabase {
 
         val documentsPath = NSFileManager.defaultManager
             .URLForDirectory(
