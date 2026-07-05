@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.ResponseBody
 import java.util.UUID
 
 class FerretInterceptor(
@@ -35,24 +34,24 @@ class FerretInterceptor(
         get() = FerretSdk.transactionRepository?.let(::SaveTransactionUseCase)
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        val uc = useCase ?: return chain.proceed(chain.request())
         val request = chain.request()
         val sessionId = UUID.randomUUID().toString()
         val startTime = System.currentTimeMillis()
 
-        saveRequest(sessionId, startTime, request)
+        saveRequest(uc, sessionId, startTime, request)
 
         return try {
             val response = chain.proceed(request)
-            saveResponse(sessionId, startTime, request, response)
+            saveResponse(uc, sessionId, startTime, request, response)
             response
         } catch (e: Exception) {
-            saveError(sessionId, startTime, e)
+            saveError(uc, sessionId, startTime, e)
             throw e
         }
     }
 
-    private fun saveRequest(sessionId: String, startTime: Long, request: Request) {
-        val uc = useCase ?: return
+    private fun saveRequest(uc: SaveTransactionUseCase, sessionId: String, startTime: Long, request: Request) {
         val requestHeaders = request.headers.map { (name, value) -> Header(name, value) }
         val body = request.body
 
@@ -83,20 +82,21 @@ class FerretInterceptor(
     }
 
     private fun saveResponse(
+        uc: SaveTransactionUseCase,
         sessionId: String,
         startTime: Long,
         request: Request,
-        response: Response
+        response: Response,
     ) {
-        val uc = useCase ?: return
         val endTime = System.currentTimeMillis()
         val responseHeaders = response.headers.map { (name, value) -> Header(name, value) }
-        val bufferedBody: ResponseBody = response.peekBody(Long.MAX_VALUE)
+        val bufferedBody = response.peekBody(Long.MAX_VALUE)
+        val bodyContent = bufferedBody.string()
         val tlsHandshake = response.handshake
 
         NotificationKit.push {
-            title(request.method)
-            message(bufferedBody.string())
+            title("${response.code} ${request.method}")
+            message(request.url.encodedPath)
         }
 
         scope.launch {
@@ -106,10 +106,10 @@ class FerretInterceptor(
                 tookMs = endTime - startTime,
                 responseCode = response.code,
                 responseMessage = response.message,
-                responsePayloadSize = bufferedBody.contentLength().takeIf { it >= 0 } ?: 0,
+                responsePayloadSize = bodyContent.length.toLong(),
                 responseContentType = bufferedBody.contentType()?.toString(),
                 responseHeaders = responseHeaders,
-                responseBody = bufferedBody.string(),
+                responseBody = bodyContent,
                 responseTlsVersion = tlsHandshake?.tlsVersion?.javaName,
                 responseCipherSuite = tlsHandshake?.cipherSuite?.javaName,
             )
@@ -117,8 +117,7 @@ class FerretInterceptor(
         }
     }
 
-    private fun saveError(sessionId: String, startTime: Long, e: Exception) {
-        val uc = useCase ?: return
+    private fun saveError(uc: SaveTransactionUseCase, sessionId: String, startTime: Long, e: Exception) {
         val endTime = System.currentTimeMillis()
 
         scope.launch {
