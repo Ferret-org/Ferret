@@ -51,6 +51,11 @@ kotlin {
             implementation(libs.core)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+
+
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.activity.compose)
         }
     }
 }

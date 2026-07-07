@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0c4483a657c5c1859721e8fbbc6a1406",
+    "identityHash": "39be457aff07c134c213a849ccb2148e",
     "entities": [
       {
         "tableName": "transactions",
@@ -198,13 +198,22 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_responseCode` ON `${TABLE_NAME}` (`responseCode`)"
+          },
+          {
+            "name": "index_transactions_protocol",
+            "unique": false,
+            "columnNames": [
+              "protocol"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_protocol` ON `${TABLE_NAME}` (`protocol`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0c4483a657c5c1859721e8fbbc6a1406')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '39be457aff07c134c213a849ccb2148e')"
     ]
   }
 }
