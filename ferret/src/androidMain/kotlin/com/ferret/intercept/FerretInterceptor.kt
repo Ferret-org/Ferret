@@ -36,6 +36,11 @@ class FerretInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val uc = useCase ?: return chain.proceed(chain.request())
         val request = chain.request()
+
+        if (request.header("Upgrade")?.lowercase() == "websocket") {
+            return chain.proceed(request)
+        }
+
         val sessionId = UUID.randomUUID().toString()
         val startTime = System.currentTimeMillis()
 

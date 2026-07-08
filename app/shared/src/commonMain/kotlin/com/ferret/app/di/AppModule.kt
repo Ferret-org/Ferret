@@ -4,6 +4,7 @@ import com.ferret.app.data.CourseRepository
 import com.ferret.app.domain.CourseRepositoryImpl
 import com.ferret.app.home.AppViewModel
 import com.ferret.app.network.CoursesService
+import com.ferret.app.network.WebSocketManager
 import com.ferret.app.network.createCoursesService
 import com.ferret.app.network.createHttpClient
 import com.ferret.app.network.json
@@ -21,6 +22,7 @@ const val BASE_URL = "https://6a43fb586dba791499abb4b0.mockapi.io/api/v1/course/
 val networkModule = module {
     single<Json> { json }
     single<HttpClient> { createHttpClient(get()) }
+    single<WebSocketManager> { WebSocketManager(get()) }
     single<Ktorfit> {
         Ktorfit.Builder()
             .baseUrl(BASE_URL)
