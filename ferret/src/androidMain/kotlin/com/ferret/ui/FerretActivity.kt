@@ -37,7 +37,7 @@ class FerretActivity : ComponentActivity() {
 
 @Composable
 private fun FerretRoute() {
-    FerretScreen(
+    FerretRoute(
         modifier = Modifier,
     )
 }

@@ -15,7 +15,7 @@ import com.ferret.model.Header
         Index("protocol")
     ]
 )
-data class TransactionEntity(
+data class NetworkRecordEntity(
 
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

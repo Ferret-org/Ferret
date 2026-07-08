@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ferret.model.Transaction
+import com.ferret.model.NetworkRecord
 import com.ferret.utils.formatBytes
 import com.ferret.utils.formatTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -29,13 +29,20 @@ import kotlin.time.Clock
 
 @Composable
 fun FerretNetworkCard(
-    transaction: Transaction,
+    id: Long,
+    method: String,
+    path: String,
+    host: String,
+    responseCode: Int,
+    tookMs: Long,
+    requestDate: Long,
+    responsePayloadSize: Long,
     modifier: Modifier = Modifier,
     onClick: (Long?) -> Unit,
 ) {
     FerretCard(
         modifier = modifier,
-        onClick = { onClick(transaction.id) },
+        onClick = { onClick(id) },
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -45,13 +52,10 @@ fun FerretNetworkCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Top
             ) {
-                transaction.method?.let {
-                    FerretBadge(
-                        text = transaction.method ?: "",
-                        type = it.badgeType(),
-                    )
-                }
-
+                FerretBadge(
+                    text = method,
+                    type = method.badgeType(),
+                )
                 Spacer(Modifier.width(16.dp))
 
                 Column(
@@ -59,46 +63,20 @@ fun FerretNetworkCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = transaction.path,
+                        text = path,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (transaction.isResponseBodyEncoded) {
-                            Icon(
-                                Icons.Default.Lock,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-
-                            Spacer(Modifier.width(4.dp))
-                        }
-                        Text(
-                            text = transaction.host,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-
-                        if (transaction.isResponseBodyEncoded) {
-                            Spacer(Modifier.width(4.dp))
-                            Icon(
-                                Icons.Default.Lock,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-
-                        }
-                    }
-
+                    Text(
+                        text = host,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
 
 
@@ -106,17 +84,15 @@ fun FerretNetworkCard(
                     horizontalAlignment = Alignment.End
                 ) {
 
-                    transaction.responseCode?.let {
-                        Text(
-                            text = it.toString(),
-                            color = statusColor(it),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+                    Text(
+                        text = responseCode.toString(),
+                        color = statusColor(responseCode),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
 
                     Text(
-                        text = "${transaction.tookMs ?: "--"} ms",
+                        text = "${tookMs ?: "--"} ms",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -131,7 +107,7 @@ fun FerretNetworkCard(
             ) {
 
                 Text(
-                    text = transaction.requestDate.formatTime(),
+                    text = requestDate.formatTime(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -139,7 +115,7 @@ fun FerretNetworkCard(
                 Spacer(Modifier.weight(1f))
 
                 Text(
-                    text = transaction.requestPayloadSize.formatBytes(),
+                    text = responsePayloadSize.formatBytes(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -181,38 +157,16 @@ private fun statusColor(code: Int): Color =
 private fun FerretNetworkCardPreview() {
     MaterialTheme {
         FerretNetworkCard(
-            transaction = Transaction(
-                id = 1,
-                sessionId = "session-1",
-                requestDate = Clock.System.now().toEpochMilliseconds(),
-                responseDate = Clock.System.now().toEpochMilliseconds() + 34,
-                tookMs = 34,
-                protocol = "HTTP/2",
-                method = "GET",
-                url = "https://api.example.com/api/users/profile",
-                host = "api.example.com",
-                path = "/api/users/profile",
-                scheme = "https",
-                responseTlsVersion = "TLS 1.3",
-                responseCipherSuite = "TLS_AES_128_GCM_SHA256",
-                requestPayloadSize = 1433,
-                requestContentType = "application/json",
-                requestHeaders = emptyList(),
-                requestHeadersSize = 0,
-                requestBody = null,
-                isRequestBodyEncoded = false,
-                responseCode = 200,
-                responseMessage = "OK",
-                error = null,
-                responsePayloadSize = 1433,
-                responseContentType = "application/json",
-                responseHeaders = emptyList(),
-                responseHeadersSize = 0,
-                responseBody = """{"success":true}""",
-                isResponseBodyEncoded = true,
-            ),
             modifier = Modifier.padding(16.dp),
-            onClick = {}
+            onClick = {},
+            id = 1,
+            method = "GET",
+            path = "/api/users/profile",
+            host = "api.example.com",
+            responseCode = 200,
+            tookMs = 34,
+            requestDate = Clock.System.now().toEpochMilliseconds(),
+            responsePayloadSize = 24,
         )
     }
 }

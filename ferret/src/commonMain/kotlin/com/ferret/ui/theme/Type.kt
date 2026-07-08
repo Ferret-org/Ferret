@@ -19,8 +19,8 @@ val FerretTypography = Typography(
     ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 15.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 21.sp,
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
