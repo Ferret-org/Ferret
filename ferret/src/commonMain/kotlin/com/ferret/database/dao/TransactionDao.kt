@@ -5,20 +5,20 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.ferret.database.entity.TransactionEntity
+import com.ferret.database.entity.NetworkRecordEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
 
     @Insert
-    suspend fun insert(entity: TransactionEntity): Long
+    suspend fun insert(entity: NetworkRecordEntity): Long
 
     @Update
-    suspend fun update(entity: TransactionEntity)
+    suspend fun update(entity: NetworkRecordEntity)
 
     @Delete
-    suspend fun delete(entity: TransactionEntity)
+    suspend fun delete(entity: NetworkRecordEntity)
 
     @Query("""
         UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
@@ -68,19 +68,19 @@ interface TransactionDao {
         SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
         ORDER BY requestDate DESC
     """)
-    fun observeAll(): Flow<List<TransactionEntity>>
+    fun observeAll(): Flow<List<NetworkRecordEntity>>
 
     @Query("""
         SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
         WHERE id = :id
     """)
-    suspend fun getById(id: Long): TransactionEntity?
+    suspend fun getById(id: Long): NetworkRecordEntity?
 
     @Query("""
         SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
         ORDER BY requestDate DESC
     """)
-    suspend fun getAll(): List<TransactionEntity>
+    suspend fun getAll(): List<NetworkRecordEntity>
 
     @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}")
     suspend fun clear()

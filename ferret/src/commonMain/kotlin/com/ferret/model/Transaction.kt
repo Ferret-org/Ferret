@@ -1,6 +1,6 @@
 package com.ferret.model
 
-data class Transaction(
+data class NetworkRecord(
 
     val id: Long = 0,
 
