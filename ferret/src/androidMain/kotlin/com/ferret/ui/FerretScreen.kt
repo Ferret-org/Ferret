@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ferret.ui.components.FerretNetworkCard
 import com.ferret.viewModel.FerretViewModel
 import com.ferret.viewModel.ferretViewModelFactory
 
@@ -28,23 +30,34 @@ fun FerretScreen(
 
     val ferretState by ferretViewModel.ferretState.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        LazyColumn {
-            ferretState.ferretList?.let {
-                items(
-                    items = it,
-                    key = { key -> key.id }
-                ) { ferretItem ->
-                    Text(text = ferretItem.path)
+    MaterialTheme {
+        Scaffold { paddingValues ->
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    ferretState.ferretList?.let {
+                        items(
+                            items = it,
+                            key = { key -> key.id }
+                        ) { ferretItem ->
+                            FerretNetworkCard(
+                                transaction = ferretItem,
+                                onClick =  {}
+                            )
+                        }
+                    }
+
                 }
             }
-
         }
+
     }
+
 
 
 }

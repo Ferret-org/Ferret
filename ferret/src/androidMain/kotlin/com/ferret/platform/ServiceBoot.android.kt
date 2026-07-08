@@ -15,8 +15,4 @@ internal actual fun bootServices(configuration: FerretConfiguration) {
             defaultChannel = configuration.notifications.defaultChannel
         )
     )
-    NotificationKit.push {
-        title("Ferret")
-        message("Welcome")
-    }
 }
