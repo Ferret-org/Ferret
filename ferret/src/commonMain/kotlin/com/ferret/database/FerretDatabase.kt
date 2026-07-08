@@ -6,11 +6,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ferret.database.converter.TransactionConverters
 import com.ferret.database.dao.TransactionDao
-import com.ferret.database.entity.TransactionEntity
+import com.ferret.database.entity.NetworkRecordEntity
 
 @Database(
     entities = [
-        TransactionEntity::class
+        NetworkRecordEntity::class
     ],
     version = 1,
     exportSchema = true

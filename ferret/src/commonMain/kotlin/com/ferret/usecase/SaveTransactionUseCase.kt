@@ -2,14 +2,14 @@ package com.ferret.usecase
 
 import com.ferret.database.converter.TransactionConverters
 import com.ferret.model.Header
-import com.ferret.model.Transaction
+import com.ferret.model.NetworkRecord
 import com.ferret.repository.TransactionRepository
 
 internal class SaveTransactionUseCase(
     private val repository: TransactionRepository
 ) {
 
-    suspend fun saveRequest(transaction: Transaction) {
+    suspend fun saveRequest(transaction: NetworkRecord) {
         repository.insert(transaction)
     }
 

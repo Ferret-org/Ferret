@@ -1,9 +1,9 @@
 package com.ferret.database.mapper
 
-import com.ferret.database.entity.TransactionEntity
-import com.ferret.model.Transaction
+import com.ferret.database.entity.NetworkRecordEntity
+import com.ferret.model.NetworkRecord
 
-internal fun Transaction.toEntity() = TransactionEntity(
+internal fun NetworkRecord.toEntity() = NetworkRecordEntity(
     id = id,
     sessionId = sessionId,
     requestDate = requestDate,
@@ -34,7 +34,7 @@ internal fun Transaction.toEntity() = TransactionEntity(
     isResponseBodyEncoded = isResponseBodyEncoded,
 )
 
-internal fun TransactionEntity.toDomain() = Transaction(
+internal fun NetworkRecordEntity.toDomain() = NetworkRecord(
     id = id,
     sessionId = sessionId,
     requestDate = requestDate,

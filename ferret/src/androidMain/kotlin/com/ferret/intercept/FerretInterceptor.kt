@@ -6,7 +6,7 @@ import com.ferret.AndroidContextHolder
 import com.ferret.FerretConfiguration
 import com.ferret.FerretSdk
 import com.ferret.model.Header
-import com.ferret.model.Transaction
+import com.ferret.model.NetworkRecord
 import com.ferret.notification.NotificationKit
 import com.ferret.usecase.InitializeFerretUseCase
 import com.ferret.usecase.SaveTransactionUseCase
@@ -67,7 +67,7 @@ class FerretInterceptor(
 
         scope.launch {
             uc.saveRequest(
-                Transaction(
+                NetworkRecord(
                     sessionId = sessionId,
                     requestDate = startTime,
                     protocol = request.url.scheme.uppercase(),

@@ -1,13 +1,13 @@
 package com.ferret.repository
 
-import com.ferret.model.Transaction
+import com.ferret.model.NetworkRecord
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
 
-    suspend fun insert(transaction: Transaction): Long
+    suspend fun insert(transaction: NetworkRecord): Long
 
-    suspend fun update(transaction: Transaction)
+    suspend fun update(transaction: NetworkRecord)
 
     suspend fun updateResponse(
         sessionId: String,
@@ -31,15 +31,15 @@ interface TransactionRepository {
         error: String?,
     )
 
-    suspend fun delete(transaction: Transaction)
+    suspend fun delete(transaction: NetworkRecord)
 
     suspend fun clear()
 
-    suspend fun get(id: Long): Transaction?
+    suspend fun getById(id: Long): NetworkRecord?
 
-    suspend fun getAll(): List<Transaction>
+    suspend fun getAll(): List<NetworkRecord>
 
-    fun observeAll(): Flow<List<Transaction>>
+    fun observeAll(): Flow<List<NetworkRecord>>
 
     suspend fun deleteOlderThan(timestamp: Long)
 }
