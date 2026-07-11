@@ -38,6 +38,8 @@ internal class FerretMonitoringWebSocketSession(
     override val outgoing: SendChannel<Frame> get() = _outgoing
     override val incoming: ReceiveChannel<Frame> get() = _incoming
 
+    override suspend fun send(frame: Frame) = _outgoing.send(frame)
+
     init {
         // Fire Connected event
         launch {

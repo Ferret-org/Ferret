@@ -1,6 +1,6 @@
 package com.ferret.usecase
 
-import com.ferret.model.Transaction
+import com.ferret.model.NetworkRecord
 import com.ferret.model.WebSocketEvent
 import com.ferret.repository.TransactionRepository
 
@@ -8,11 +8,11 @@ internal class SaveWebSocketEventUseCase(
     private val repository: TransactionRepository
 ) {
     suspend fun save(event: WebSocketEvent) {
-        repository.insert(event.toTransaction())
+        repository.insert(event.toNetworkRecord())
     }
 
-    private fun WebSocketEvent.toTransaction(): Transaction = when (this) {
-        is WebSocketEvent.Connected -> Transaction(
+    private fun WebSocketEvent.toNetworkRecord(): NetworkRecord = when (this) {
+        is WebSocketEvent.Connected -> NetworkRecord(
             sessionId = "$connectionId-connect",
             requestDate = timestamp,
             protocol = if (url.startsWith("wss")) "WSS" else "WS",
@@ -27,7 +27,7 @@ internal class SaveWebSocketEventUseCase(
             responseMessage = "Switching Protocols",
         )
 
-        is WebSocketEvent.FrameReceived -> Transaction(
+        is WebSocketEvent.FrameReceived -> NetworkRecord(
             sessionId = "$connectionId-in-$count",
             requestDate = timestamp,
             protocol = "WS",
@@ -41,7 +41,7 @@ internal class SaveWebSocketEventUseCase(
             requestContentType = frameType,
         )
 
-        is WebSocketEvent.FrameSent -> Transaction(
+        is WebSocketEvent.FrameSent -> NetworkRecord(
             sessionId = "$connectionId-out-$count",
             requestDate = timestamp,
             protocol = "WS",
@@ -55,7 +55,7 @@ internal class SaveWebSocketEventUseCase(
             requestContentType = frameType,
         )
 
-        is WebSocketEvent.Disconnected -> Transaction(
+        is WebSocketEvent.Disconnected -> NetworkRecord(
             sessionId = "$connectionId-close",
             requestDate = timestamp,
             protocol = "WS",

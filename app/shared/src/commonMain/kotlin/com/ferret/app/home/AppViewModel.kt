@@ -59,10 +59,9 @@ class AppViewModel(
     fun disconnectWebSocket() = wsManager.disconnect()
 
     fun sendWsMessage() = viewModelScope.launch {
-        val jsonString = """
-{"header":{"destination_service":"greed","source_service":"native","user_id":"25171","timestamp":1770056994630,"packet_name":"gw","session_id":"betta","cv":"339"}}
-""".trimIndent()
-        wsManager.send("ping")
+        val js =
+            """{"header":{"destination_service":"greed-v2","internal_initiator":"","packet_name":"gruf","session_id":"Hi","source_service":"native","timestamp":1783538905630,"user_id":"25421","cv":"339"},"payload":{"type":"com.apps.common.model.socket.GetUserFeedPacketRequest","si":"","ecv":282,"wc":{"hwcf":130,"howcv":33,"hgwcv":11,"hswcv":14,"wwcv":6,"twcf":29},"bc":{"hfbcv":15,"hnbcv":70,"tbcv":6,"pvpbcv":8},"fc":{"agcv":-1,"pvpcv":82,"pvptcv":-1,"ptcv":-1,"abcv":-1,"scv":150,"psbscv":97,"mcv":57,"acv":-1,"faqcv":14,"scfaqcv":3,"xppcv":132,"ocv":2,"sccv":40},"pt":{"bsr":[]},"lbut":1783538490,"cs":"organic","cb":"game"}}""".trimIndent()
+        wsManager.send(js)
     }
 
     override fun onCleared() {
@@ -71,7 +70,8 @@ class AppViewModel(
     }
 
     companion object {
-//        private const val WS_URL = "wss://dev-tusk.bebetta.in/ws?token=eyJ0IjoiZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBaQ0k2SWpJMU1UY3hJaXdpZG1WeWMybHZia052WkdVaU9qTXpPU3dpYVhOeklqb2lkSFZ6YXlJc0ltVjRjQ0k2TVRjNE16VTVNRFV6TkN3aWJtSm1Jam94Tnpnek5ERTNOek0wTENKcFlYUWlPakUzT0RNME1UYzNNelI5LkxCZzdGSWU3OUUwdi1hbjJxOEw5alNFaFNFWHIxMVg4RWhpQmRMTXp4ZWMiLCJkIjoiZFptdjh0NDRUZXlfYXdIZ1NyalcybDpBUEE5MWJFVG5DZUx6ZUlOYW5QTmUxdElKTV95d19xam9CNGE1ZEdYM19xTGFWUkpPMGhOaElPYVAzXzFLbk9rU0NybUtyMkU0cTEzNURwYzBiT3F6RlVxZUZKM0RNZTR3Smx6bTdkelRUSGpRYUZzUEppSEZ0RSIsImN2IjoiMzM5IiwiYSI6IiIsInUiOiJzZWxlY3RpdmVfc2NhcmxldF9uYXRhIn0="
-        private const val WS_URL = "wss://echo.websocket.org"
+        //        private const val WS_URL = "wss://echo.websocket.org"
+        private const val WS_URL =
+            "wss://dev-tusk.bebetta.in/ws?token=eyJ0IjoiZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBaQ0k2SWpJMU5UYzBJaXdpZG1WeWMybHZia052WkdVaU9qTXpPU3dpYVhOeklqb2lkSFZ6YXlJc0ltVjRjQ0k2TVRjNE16azFNVE0yTlN3aWJtSm1Jam94Tnpnek56YzROVFkxTENKcFlYUWlPakUzT0RNM056ZzFOalY5LnhNTDVRWnpxNlBlMXFscWpVeTFLNU1YLS1UbUhsVUZPZUdLRTZfa0p5cU0iLCJkIjoiZFptdjh0NDRUZXlfYXdIZ1NyalcybDpBUEE5MWJIbmUweVRsRjdPVnFiRVVzczRxN1ZkM2NhS25ySGRuREpSZHdEQ0JMb3p5bl83dGlOdnhpdFNCNFBoZzc4SkdRSWVzTDAwNnItUzR5bEdLeGNob19ZNnRhSGtaQ083alloQ3VBZUpDVEg4NDdwX1RlOCIsImN2IjoiMzM5IiwiYSI6Imh0dHBzOi8vbWVkaWEuYmViZXR0YS5pbi9wcm9maWxlX2ltYWdlcy9yb2JvdF8yNS53ZWJwIiwidSI6InVzZXJfdGh6em9hOHNoeDEifQ=="
     }
 }

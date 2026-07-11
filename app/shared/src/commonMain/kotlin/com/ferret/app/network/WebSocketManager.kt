@@ -67,6 +67,7 @@ class WebSocketManager(private val client: HttpClient) {
                                 }
                                 _messages.emit(frame.readText())
                             }
+
                             else -> {}
                         }
                     }
@@ -97,7 +98,7 @@ class WebSocketManager(private val client: HttpClient) {
     }
 
     suspend fun send(text: String) {
-        session?.outgoing?.send(Frame.Text(text))
+        session?.send(Frame.Text(text))
     }
 
     fun disconnect() {
