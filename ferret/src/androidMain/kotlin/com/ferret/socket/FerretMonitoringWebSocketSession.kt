@@ -1,4 +1,4 @@
-package com.ferret.intercept
+package com.ferret.socket
 
 import android.util.Base64
 import android.util.Log
@@ -96,7 +96,12 @@ internal class FerretMonitoringWebSocketSession(
                 }
             } finally {
                 launch {
-                    useCase?.save(WebSocketEvent.Disconnected(connectionId, System.currentTimeMillis()))
+                    useCase?.save(
+                        WebSocketEvent.Disconnected(
+                            connectionId,
+                            System.currentTimeMillis()
+                        )
+                    )
                     Log.d("FerretWS", "WS DISCONNECTED $url")
                 }
             }

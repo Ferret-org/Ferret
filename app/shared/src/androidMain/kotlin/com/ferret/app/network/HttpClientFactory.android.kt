@@ -1,7 +1,7 @@
 package com.ferret.app.network
 
-import com.ferret.intercept.FerretInterceptor
-import com.ferret.intercept.installFerretWebSocket
+import com.ferret.intercept.Ferret
+import com.ferret.intercept.install
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.serialization.json.Json
@@ -21,8 +21,9 @@ actual fun createHttpClient(json: Json): HttpClient = HttpClient(OkHttp) {
                 )
             )
         }
-        addInterceptor(FerretInterceptor(context = applicationContext))
     }
-    installFerretWebSocket()
+    install(Ferret) {
+        context = applicationContext
+    }
     configureShared(json)
 }
