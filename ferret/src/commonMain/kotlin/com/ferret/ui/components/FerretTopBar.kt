@@ -1,5 +1,7 @@
 package com.ferret.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,7 +38,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun FerretTopBar(
-    title: String,
+    title: String? = null,
     modifier: Modifier = Modifier,
     navigationIcon: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
@@ -49,41 +52,48 @@ fun FerretTopBar(
         color = containerColor,
         contentColor = contentColor,
     ) {
-        Column {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height)
+                .padding(horizontal = 8.dp),
+            contentAlignment = Alignment.Center,
+        ) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height)
-                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                if (navigationIcon != null) {
-                    navigationIcon()
+                Box {
+                    navigationIcon?.invoke()
                 }
 
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .wrapContentHeight()
-                        .padding(start = if (navigationIcon != null) 4.dp else 16.dp),
-                ) {
-                    if (titleContent != null) {
-                        titleContent()
-                    } else {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = contentColor,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically, content = actions)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = actions,
+                )
             }
 
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 56.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (titleContent != null) {
+                    titleContent()
+                } else {
+                    Text(
+                        text = title.orEmpty(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = contentColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
         }
     }
 }

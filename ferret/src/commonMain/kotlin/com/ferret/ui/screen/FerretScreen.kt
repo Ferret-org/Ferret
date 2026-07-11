@@ -22,7 +22,12 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,15 +36,19 @@ import com.ferret.common.FerretTab
 import com.ferret.ui.components.FerretNetworkCard
 import com.ferret.ui.components.FerretSearchBar
 import com.ferret.ui.theme.FerretTypography
+import com.ferret.viewModel.FerretDetailViewModel
 import com.ferret.viewModel.FerretViewModel
 
 @Composable
-fun FerretScreen(
+fun FerretNetworkListScreen(
     modifier: Modifier = Modifier,
     ferretViewModel: FerretViewModel,
+    onItemClick: (Long) -> Unit,
 ) {
+
     val ferretState by ferretViewModel.ferretState.collectAsStateWithLifecycle()
     val query by ferretViewModel.searchQuery.collectAsStateWithLifecycle()
+
 
     MaterialTheme {
         Scaffold(
@@ -62,6 +71,7 @@ fun FerretScreen(
                         query = query,
                         onQueryChange = ferretViewModel::onSearchQueryChanged,
                         placeholder = when (ferretState.selectedTab) {
+                            FerretTab.ALL -> "Search..."
                             FerretTab.HTTP -> "Search HTTP requests..."
                             FerretTab.WEBSOCKET -> "Search WebSocket connections..."
                         },
@@ -84,7 +94,9 @@ fun FerretScreen(
                         key = { key -> key.id }
                     ) { ferretItem ->
                         FerretNetworkCard(
-                            onClick = {},
+                            onClick = {
+                                onItemClick(it)
+                            },
                             id = ferretItem.id,
                             method = ferretItem.method ?: "",
                             path = ferretItem.path,
@@ -99,11 +111,9 @@ fun FerretScreen(
                 }
             }
         }
-
     }
 
 }
-
 
 @Composable
 fun FerretTopBar(

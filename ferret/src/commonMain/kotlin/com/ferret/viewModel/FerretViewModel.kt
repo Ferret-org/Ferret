@@ -29,7 +29,7 @@ class FerretViewModel(
     private val clearDatabaseUseCase: ClearDatabaseUseCase
 ) : ViewModel() {
 
-    private val selectedTab = MutableStateFlow(FerretTab.HTTP)
+    private val selectedTab = MutableStateFlow(FerretTab.ALL)
 
     private val _searchQuery = MutableStateFlow("")
 
@@ -53,11 +53,14 @@ class FerretViewModel(
     ) { transactions, tab, query ->
 
         val filteredByTab = when (tab) {
+            FerretTab.ALL ->
+                transactions
+
             FerretTab.HTTP ->
-                transactions.filter { !it.protocol.equals("WEBSOCKET", ignoreCase = true) }
+                transactions.filter { !it.protocol.equals("WS", ignoreCase = true) }
 
             FerretTab.WEBSOCKET ->
-                transactions.filter { it.protocol.equals("WEBSOCKET", ignoreCase = true) }
+                transactions.filter { it.protocol.equals("WS", ignoreCase = true) }
         }
 
         val filtered = if (query.isBlank()) {
@@ -88,7 +91,7 @@ class FerretViewModel(
     }
 }
 data class FerretUiState(
-    val selectedTab: FerretTab = FerretTab.HTTP,
+    val selectedTab: FerretTab = FerretTab.ALL,
     val ferretList: List<NetworkRecord> = emptyList(),
     val searchQuery: String = "",
     val hasActiveFilters: Boolean = false,

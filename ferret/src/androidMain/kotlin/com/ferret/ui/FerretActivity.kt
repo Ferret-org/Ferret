@@ -26,12 +26,10 @@ class FerretActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        android.util.Log.d("Ferret", "onNewIntent: $this")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        android.util.Log.d("Ferret", "onDestroy: $this")
     }
 }
 

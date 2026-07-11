@@ -19,11 +19,12 @@ ktorVersion = "3.5.1"
 core = "1.19.0"
 appcompat = "1.7.1"
 kotlinxDatetime = "0.7.1"
+navigation = "2.9.2"
 
 # Sample app deps
 androidx-activity = "1.13.0"
 androidx-core = "1.19.0"
-androidx-lifecycle = "2.11.0-beta02"
+androidx-lifecycle = "2.10.0"
 composeMultiplatform = "1.10.3"
 material3 = "1.11.0-alpha07"
 
@@ -42,6 +43,8 @@ ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", v
 core = { group = "androidx.core", name = "core", version.ref = "core" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
+
 
 #room libs
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
