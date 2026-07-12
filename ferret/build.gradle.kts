@@ -47,6 +47,7 @@ kotlin {
 
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
+            implementation(libs.embedded.koin.core)
         }
 
         androidMain.dependencies {
@@ -62,6 +63,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.embedded.koin.core)
+            implementation(libs.embedded.koin.android)
         }
     }
 }

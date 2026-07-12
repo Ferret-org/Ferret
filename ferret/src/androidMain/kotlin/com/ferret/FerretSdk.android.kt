@@ -1,10 +1,11 @@
 package com.ferret
 
-internal actual fun createRepository(
-    configuration: FerretConfiguration
-): FerretRepository {
-    return FerretRepository(
-        context = AndroidContextHolder.context,
-        configuration = configuration
-    )
+import android.content.Context
+import com.ferret.di.FerretKoin
+
+fun FerretSdk.init(
+    context: Context,
+    configuration: FerretConfiguration = FerretConfiguration()
+) {
+    FerretKoin.start(context.applicationContext, configuration)
 }

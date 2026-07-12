@@ -1,14 +1,14 @@
 package com.ferret.intercept
 
 import android.content.Context
-import com.ferret.AndroidContextHolder
 import com.ferret.FerretConfiguration
 import com.ferret.FerretSdk
+import com.ferret.di.FerretKoin
+import com.ferret.init
 import com.ferret.model.Header
 import com.ferret.model.NetworkRecord
 import com.ferret.notification.NotificationKit
 import com.ferret.socket.FerretMonitoringWebSocketSession
-import com.ferret.usecase.InitializeFerretUseCase
 import com.ferret.usecase.SaveTransactionUseCase
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -42,8 +42,7 @@ object Ferret {
 
 fun HttpClientConfig<*>.install(ferret: Ferret, block: Ferret.Config.() -> Unit) {
     val config = Ferret.Config().apply(block)
-    AndroidContextHolder.context = config.context.applicationContext
-    InitializeFerretUseCase(config.configuration).execute()
+    FerretSdk.init(config.context, config.configuration)
     install(WebSockets)
     install(FerretMonitorPlugin)
 }
@@ -66,8 +65,7 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
                 return@intercept execute(request)
             }
 
-            val useCase = runCatching { FerretSdk.transactionRepository }
-                .getOrNull()?.let(::SaveTransactionUseCase)
+            val useCase = runCatching { FerretKoin.koin.get<SaveTransactionUseCase>() }.getOrNull()
 
             val sessionId = UUID.randomUUID().toString()
             val startTime = System.currentTimeMillis()

@@ -2,7 +2,6 @@ package com.ferret.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ferret.FerretSdk
 import com.ferret.common.FerretTab
 import com.ferret.model.NetworkRecord
 import com.ferret.repository.TransactionRepository

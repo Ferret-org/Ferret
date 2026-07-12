@@ -15,6 +15,10 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://dl.google.com/dl/android/maven2/")
+        maven {
+            url = uri("https://repository.kotzilla.io/repository/kotzilla-platform/")
+            url = uri("https://repository.kotzilla.io/repository/Koin-Embedded/")
+        }
     }
 }
 

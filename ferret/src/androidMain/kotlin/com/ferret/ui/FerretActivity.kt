@@ -5,8 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.activity.viewModels
+import com.ferret.viewModel.FerretViewModel
 
 /**
  * Ferret-owned activity. Opens when the user taps the Ferret notification.
@@ -14,13 +14,15 @@ import androidx.compose.ui.Modifier
  */
 class FerretActivity : ComponentActivity() {
 
+    private val ferretViewModel: FerretViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         android.util.Log.d("Ferret", "onCreate: $this")
 
         enableEdgeToEdge()
         setContent {
-            FerretRoute()
+            FerretRoute(ferretViewModel = ferretViewModel)
         }
     }
 
@@ -33,11 +35,4 @@ class FerretActivity : ComponentActivity() {
         super.onDestroy()
         android.util.Log.d("Ferret", "onDestroy: $this")
     }
-}
-
-@Composable
-private fun FerretRoute() {
-    FerretRoute(
-        modifier = Modifier,
-    )
 }

@@ -2,7 +2,7 @@ package com.ferret.socket
 
 import android.util.Base64
 import android.util.Log
-import com.ferret.FerretSdk
+import com.ferret.di.FerretKoin
 import com.ferret.model.WebSocketEvent
 import com.ferret.usecase.SaveWebSocketEventUseCase
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -27,7 +27,7 @@ internal class FerretMonitoringWebSocketSession(
     private val frameCounter = AtomicInteger(0)
 
     private val useCase: SaveWebSocketEventUseCase?
-        get() = FerretSdk.transactionRepository?.let(::SaveWebSocketEventUseCase)
+        get() = runCatching { FerretKoin.koin.get<SaveWebSocketEventUseCase>() }.getOrNull()
 
     // Proxy outgoing: user → _outgoing → observe → delegate.outgoing
     private val _outgoing: Channel<Frame> = Channel(Channel.UNLIMITED)
