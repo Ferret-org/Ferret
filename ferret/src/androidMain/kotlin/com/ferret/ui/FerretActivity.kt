@@ -1,12 +1,25 @@
 package com.ferret.ui
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.ferret.FerretSdk
 
 /**
  * Ferret-owned activity. Opens when the user taps the Ferret notification.
@@ -14,22 +27,36 @@ import androidx.compose.ui.Modifier
  */
 class FerretActivity : ComponentActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(
+        savedInstanceState: Bundle?,
+    ) {
         super.onCreate(savedInstanceState)
-        android.util.Log.d("Ferret", "onCreate: $this")
 
         enableEdgeToEdge()
+
+        if (!FerretSdk.isInitialized) {
+            showInitializationError()
+            return
+        }
+
         setContent {
             FerretRoute()
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun showInitializationError() {
+        AlertDialog.Builder(this)
+            .setTitle("Ferret isn't initialized")
+            .setMessage(
+                "Initialize Ferret before opening the network inspector."
+            )
+            .setPositiveButton("OK") { _, _ ->
+                finish()
+            }
+            .setOnCancelListener {
+                finish()
+            }
+            .show()
     }
 }
 

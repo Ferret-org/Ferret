@@ -18,6 +18,8 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+
+            export(libs.ferret.lib)
         }
     }
     
@@ -76,11 +78,11 @@ kotlin {
 
             implementation(libs.kermit.logging)
 
-            implementation(libs.ferret.lib)
+            api(libs.ferret.lib)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
-            implementation(libs.ferret.lib)
+//            implementation(libs.ferret.lib)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
