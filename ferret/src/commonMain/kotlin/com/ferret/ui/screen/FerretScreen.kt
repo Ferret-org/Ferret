@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ferret.common.FerretTab
@@ -87,32 +88,84 @@ fun FerretNetworkListScreen(
                     .padding(paddingValues)
             ) {
                 LazyColumn(
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
                 ) {
-                    items(
-                        items = ferretState.ferretList,
-                        key = { key -> key.id }
-                    ) { ferretItem ->
-                        FerretNetworkCard(
-                            onClick = {
-                                onItemClick(it)
-                            },
-                            id = ferretItem.id,
-                            method = ferretItem.method ?: "",
-                            path = ferretItem.path,
-                            host = ferretItem.host,
-                            responseCode = ferretItem.responseCode ?: 0,
-                            tookMs = ferretItem.tookMs ?: 0,
-                            requestDate = ferretItem.requestDate,
-                            responsePayloadSize = ferretItem.responsePayloadSize,
-                        )
-                    }
+                    ferretState.sessions.forEach { session ->
 
+                        item(
+                            key = "session-${session.sessionId}",
+                        ) {
+                            FerretSessionHeader(
+                                sessionId = session.sessionId,
+                                requestCount = session.records.size,
+                            )
+                        }
+
+                        items(
+                            items = session.records,
+                            key = { record ->
+                                record.id
+                            },
+                        ) { ferretItem ->
+                            FerretNetworkCard(
+                                onClick = onItemClick,
+                                id = ferretItem.id,
+                                method = ferretItem.method.orEmpty(),
+                                path = ferretItem.path,
+                                host = ferretItem.host,
+                                responseCode = ferretItem.responseCode ?: 0,
+                                tookMs = ferretItem.tookMs ?: 0,
+                                requestDate = ferretItem.requestDate,
+                                responsePayloadSize = ferretItem.responsePayloadSize,
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 
+}
+
+
+@Composable
+fun FerretSessionHeader(
+    sessionId: String,
+    requestCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                top = 16.dp,
+                bottom = 8.dp,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Session",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Text(
+                text = sessionId.take(3),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+
+        Text(
+            text = "$requestCount requests",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 @Composable
