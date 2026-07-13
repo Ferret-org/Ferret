@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
+import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
@@ -13,19 +14,19 @@ internal actual object DatabaseFactory {
     @OptIn(ExperimentalForeignApi::class)
     actual fun createDatabase(): FerretDatabase {
 
-        val documentsPath = NSFileManager.defaultManager
+        val applicationSupportUrl = NSFileManager.defaultManager
             .URLForDirectory(
-                directory = NSDocumentDirectory,
+                directory = NSApplicationSupportDirectory,
                 inDomain = NSUserDomainMask,
                 appropriateForURL = null,
-                create = false,
-                error = null
-            )!!.path!!
+                create = true,
+                error = null,
+            ) ?: error("Unable to resolve Application Support directory")
 
-        val dbPath = "$documentsPath/ferret.db"
+        val databasePath = "${applicationSupportUrl.path}/ferret.db"
 
         return Room.databaseBuilder<FerretDatabase>(
-            name = dbPath
+            name = databasePath,
         )
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.Default)
