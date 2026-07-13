@@ -38,7 +38,7 @@ fun FerretNetworkCard(
     requestDate: Long,
     responsePayloadSize: Long,
     modifier: Modifier = Modifier,
-    onClick: (Long?) -> Unit,
+    onClick: (Long) -> Unit,
 ) {
     FerretCard(
         modifier = modifier,
@@ -92,7 +92,7 @@ fun FerretNetworkCard(
                     )
 
                     Text(
-                        text = "${tookMs ?: "--"} ms",
+                        text = "$tookMs ms",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -138,6 +138,10 @@ private fun String.badgeType(): FerretBadgeType =
         "POST" -> FerretBadgeType.Blue
         "PUT" -> FerretBadgeType.Orange
         "DELETE" -> FerretBadgeType.Red
+        "CONNECTED" -> FerretBadgeType.Green
+        "DISCONNECTED" -> FerretBadgeType.Red
+        "FRAME_IN" -> FerretBadgeType.Green
+        "FRAME_OUT" -> FerretBadgeType.Red
         else -> FerretBadgeType.Neutral
     }
 
