@@ -27,11 +27,13 @@ class FerretDetailViewModel(
         .networkId
 
     private val _ferretDetail = MutableStateFlow<NetworkRecord?>(null)
-    val ferretDetail = _ferretDetail.asStateFlow()
-
-    init {
+    val ferretDetail = _ferretDetail.onStart {
         loadTransaction()
-    }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        null,
+    )
 
     private fun loadTransaction() {
         viewModelScope.launch(Dispatchers.IO) {
