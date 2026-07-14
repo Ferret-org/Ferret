@@ -9,7 +9,7 @@ import com.ferret.model.Header
 @Entity(
     tableName = DatabaseConstants.TRANSACTIONS_TABLE,
     indices = [
-        Index("sessionId", unique = true),
+        Index("sessionId"),
         Index("requestDate"),
         Index("responseCode"),
         Index("protocol")

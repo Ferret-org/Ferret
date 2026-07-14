@@ -8,65 +8,40 @@ internal class SaveWebSocketEventUseCase(
     private val repository: TransactionRepository
 ) {
     suspend fun save(event: WebSocketEvent) {
-        repository.insert(event.toNetworkRecord())
-    }
+        when (event) {
+            is WebSocketEvent.Connected -> repository.insert(
+                NetworkRecord(
+                    sessionId = event.connectionId,
+                    requestDate = event.timestamp,
+                    protocol = if (event.url.startsWith("wss")) "WSS" else "WS",
+                    method = "CONNECTED",
+                    url = event.url,
+                    host = wsHost(event.url),
+                    path = wsPath(event.url),
+                    scheme = if (event.url.startsWith("wss")) "wss" else "ws",
+                    responseCode = 101,
+                    responseMessage = "Switching Protocols",
+                )
+            )
 
-    private fun WebSocketEvent.toNetworkRecord(): NetworkRecord = when (this) {
-        is WebSocketEvent.Connected -> NetworkRecord(
-            sessionId = "$connectionId-connect",
-            requestDate = timestamp,
-            protocol = if (url.startsWith("wss")) "WSS" else "WS",
-            method = "CONNECTED",
-            url = url,
-            host = wsHost(url),
-            path = wsPath(url),
-            scheme = if (url.startsWith("wss")) "wss" else "ws",
-            responseDate = timestamp,
-            tookMs = 0,
-            responseCode = 101,
-            responseMessage = "Switching Protocols",
-        )
+            is WebSocketEvent.FrameReceived -> repository.updateWsFrameIn(
+                sessionId = event.connectionId,
+                responseBody = event.data,
+                responsePayloadSize = event.sizeBytes,
+            )
 
-        is WebSocketEvent.FrameReceived -> NetworkRecord(
-            sessionId = "$connectionId-in-$count",
-            requestDate = timestamp,
-            protocol = "WS",
-            method = "FRAME_IN",
-            url = connectionId,
-            host = "",
-            path = "",
-            scheme = "ws",
-            responseBody = data,
-            responsePayloadSize = sizeBytes,
-            requestContentType = frameType,
-        )
+            is WebSocketEvent.FrameSent -> repository.updateWsFrameOut(
+                sessionId = event.connectionId,
+                requestBody = event.data,
+                requestPayloadSize = event.sizeBytes,
+            )
 
-        is WebSocketEvent.FrameSent -> NetworkRecord(
-            sessionId = "$connectionId-out-$count",
-            requestDate = timestamp,
-            protocol = "WS",
-            method = "FRAME_OUT",
-            url = connectionId,
-            host = "",
-            path = "",
-            scheme = "ws",
-            requestBody = data,
-            requestPayloadSize = sizeBytes,
-            requestContentType = frameType,
-        )
-
-        is WebSocketEvent.Disconnected -> NetworkRecord(
-            sessionId = "$connectionId-close",
-            requestDate = timestamp,
-            protocol = "WS",
-            method = "DISCONNECTED",
-            url = connectionId,
-            host = "",
-            path = "",
-            scheme = "ws",
-            responseDate = timestamp,
-            tookMs = 0,
-        )
+            is WebSocketEvent.Disconnected -> repository.updateWsClose(
+                sessionId = event.connectionId,
+                responseDate = event.timestamp,
+                tookMs = event.tookMs,
+            )
+        }
     }
 
     private fun wsHost(url: String) =

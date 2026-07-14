@@ -52,6 +52,8 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
 
     override val key: AttributeKey<FerretMonitorPlugin> = AttributeKey("FerretMonitor")
 
+    val appSessionId: String = UUID.randomUUID().toString()
+
     private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private const val MAX_BODY_BYTES = 65_536
 
@@ -60,7 +62,6 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
     @OptIn(InternalAPI::class)
     override fun install(plugin: FerretMonitorPlugin, scope: HttpClient) {
 
-        // HTTP monitoring
         scope.plugin(HttpSend).intercept { request ->
             if (request.headers[HttpHeaders.Upgrade]?.lowercase() == "websocket") {
                 return@intercept execute(request)
@@ -68,8 +69,7 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
 
             val useCase = runCatching { FerretSdk.transactionRepository }
                 .getOrNull()?.let(::SaveTransactionUseCase)
-
-            val sessionId = UUID.randomUUID().toString()
+            val sessionId = appSessionId
             val startTime = System.currentTimeMillis()
             val requestHeaders = request.headers.build().entries()
                 .flatMap { (key, values) -> values.map { Header(key, it) } }
@@ -146,14 +146,13 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
             }
         }
 
-        // WebSocket monitoring
         scope.responsePipeline.intercept(HttpResponsePipeline.After) { (info, body) ->
             if (body !is DefaultClientWebSocketSession) {
                 proceed()
                 return@intercept
             }
             val url = context.request.url.toString()
-            val monitoringDelegate = FerretMonitoringWebSocketSession(body, url)
+            val monitoringDelegate = FerretMonitoringWebSocketSession(body, url, appSessionId)
             val wrapped = DefaultClientWebSocketSession(body.call, monitoringDelegate)
             proceedWith(HttpResponseContainer(info, wrapped))
         }

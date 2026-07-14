@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "39be457aff07c134c213a849ccb2148e",
+    "identityHash": "9e2ae228def367e9c5a0a015bff93788",
     "entities": [
       {
         "tableName": "transactions",
@@ -174,12 +174,12 @@
         "indices": [
           {
             "name": "index_transactions_sessionId",
-            "unique": true,
+            "unique": false,
             "columnNames": [
               "sessionId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_transactions_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
           },
           {
             "name": "index_transactions_requestDate",
@@ -213,7 +213,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '39be457aff07c134c213a849ccb2148e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e2ae228def367e9c5a0a015bff93788')"
     ]
   }
 }
