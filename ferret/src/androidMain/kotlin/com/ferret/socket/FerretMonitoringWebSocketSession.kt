@@ -14,25 +14,23 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
-import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class FerretMonitoringWebSocketSession(
     private val delegate: DefaultClientWebSocketSession,
     private val url: String,
+    sessionId: String,
 ) : DefaultWebSocketSession by delegate {
 
-    private val connectionId: String = UUID.randomUUID().toString()
+    private val connectionId: String = sessionId
     private val frameCounter = AtomicInteger(0)
+    private val connectedAt: Long = System.currentTimeMillis()
 
     private val useCase: SaveWebSocketEventUseCase?
         get() = FerretSdk.transactionRepository?.let(::SaveWebSocketEventUseCase)
 
-    // Proxy outgoing: user → _outgoing → observe → delegate.outgoing
     private val _outgoing: Channel<Frame> = Channel(Channel.UNLIMITED)
-
-    // Proxy incoming: delegate.incoming → observe → _incoming → user
     private val _incoming: ReceiveChannel<Frame>
 
     override val outgoing: SendChannel<Frame> get() = _outgoing
@@ -41,13 +39,11 @@ internal class FerretMonitoringWebSocketSession(
     override suspend fun send(frame: Frame) = _outgoing.send(frame)
 
     init {
-        // Fire Connected event
         launch {
-            useCase?.save(WebSocketEvent.Connected(connectionId, System.currentTimeMillis(), url))
+            useCase?.save(WebSocketEvent.Connected(connectionId, connectedAt, url))
             Log.d("FerretWS", "WS CONNECTED $url")
         }
 
-        // Outgoing proxy
         launch {
             for (frame in _outgoing) {
                 if (frame !is Frame.Close) {
@@ -73,7 +69,6 @@ internal class FerretMonitoringWebSocketSession(
             }
         }
 
-        // Incoming proxy
         _incoming = produce(capacity = Channel.UNLIMITED) {
             try {
                 for (frame in delegate.incoming) {
@@ -95,11 +90,13 @@ internal class FerretMonitoringWebSocketSession(
                     send(frame)
                 }
             } finally {
+                val disconnectedAt = System.currentTimeMillis()
                 launch {
                     useCase?.save(
                         WebSocketEvent.Disconnected(
-                            connectionId,
-                            System.currentTimeMillis()
+                            connectionId = connectionId,
+                            timestamp = disconnectedAt,
+                            tookMs = disconnectedAt - connectedAt,
                         )
                     )
                     Log.d("FerretWS", "WS DISCONNECTED $url")

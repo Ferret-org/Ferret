@@ -31,6 +31,12 @@ interface TransactionRepository {
         error: String?,
     )
 
+    suspend fun updateWsFrameIn(sessionId: String, responseBody: String?, responsePayloadSize: Long)
+
+    suspend fun updateWsFrameOut(sessionId: String, requestBody: String?, requestPayloadSize: Long)
+
+    suspend fun updateWsClose(sessionId: String, responseDate: Long, tookMs: Long)
+
     suspend fun delete(transaction: NetworkRecord)
 
     suspend fun clear()

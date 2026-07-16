@@ -31,5 +31,6 @@ sealed class WebSocketEvent {
     data class Disconnected(
         override val connectionId: String,
         override val timestamp: Long,
+        val tookMs: Long,
     ) : WebSocketEvent()
 }

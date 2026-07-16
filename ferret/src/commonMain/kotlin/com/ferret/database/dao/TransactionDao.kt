@@ -65,6 +65,33 @@ interface TransactionDao {
     )
 
     @Query("""
+        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SET responseBody        = :responseBody,
+            responsePayloadSize = :responsePayloadSize
+        WHERE sessionId = :sessionId
+    """)
+    suspend fun updateWsFrameIn(sessionId: String, responseBody: String?, responsePayloadSize: Long)
+
+    @Query("""
+        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SET requestBody        = :requestBody,
+            requestPayloadSize = :requestPayloadSize
+        WHERE sessionId = :sessionId
+    """)
+    suspend fun updateWsFrameOut(sessionId: String, requestBody: String?, requestPayloadSize: Long)
+
+    @Query("""
+        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SET responseDate = :responseDate,
+            tookMs       = :tookMs
+        WHERE sessionId = :sessionId
+    """)
+    suspend fun updateWsClose(sessionId: String, responseDate: Long, tookMs: Long)
+
+    @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}")
+    suspend fun clear()
+
+    @Query("""
         SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
         ORDER BY requestDate DESC
     """)
@@ -81,9 +108,6 @@ interface TransactionDao {
         ORDER BY requestDate DESC
     """)
     suspend fun getAll(): List<NetworkRecordEntity>
-
-    @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}")
-    suspend fun clear()
 
     @Query("""
         DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
