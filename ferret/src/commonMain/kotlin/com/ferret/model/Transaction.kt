@@ -57,4 +57,10 @@ data class NetworkRecord(
     val responseBody: String? = null,
 
     val isResponseBodyEncoded: Boolean = false,
-)
+) {
+    val isWebSocket: Boolean
+        get() = protocol.equals(
+            other = "WS",
+            ignoreCase = true,
+        )
+}

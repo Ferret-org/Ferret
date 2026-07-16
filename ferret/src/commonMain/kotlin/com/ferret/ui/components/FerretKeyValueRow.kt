@@ -94,8 +94,8 @@ fun FerretHeadersCard(
 fun FerretBodyCard(
     title: String,
     body: String,
-    contentType: String?,
-    encoded: Boolean,
+    contentType: String? = null,
+    encoded: Boolean? = null,
     modifier: Modifier = Modifier,
 ) {
     val formattedBody = remember(
@@ -103,7 +103,7 @@ fun FerretBodyCard(
         contentType,
         encoded,
     ) {
-        if (encoded) {
+        if (encoded == true) {
             body
         } else {
             formatBody(
