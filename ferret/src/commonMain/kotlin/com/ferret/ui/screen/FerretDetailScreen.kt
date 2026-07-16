@@ -3,7 +3,6 @@ package com.ferret.ui.screen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -37,17 +35,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ferret.common.FerretDetailTab
+import com.ferret.common.FerretNetworkDetailTab
 import com.ferret.model.NetworkRecord
 import com.ferret.ui.components.FerretBodyCard
-import com.ferret.ui.components.FerretCard
+import com.ferret.ui.components.FerretDetailContent
 import com.ferret.ui.components.FerretHeadersCard
-import com.ferret.ui.components.FerretKeyValueRow
-import com.ferret.ui.components.FerretSectionTitle
 import com.ferret.ui.components.FerretTopBar
+import com.ferret.ui.mapper.toHttpOverviewSections
+import com.ferret.ui.mapper.toRequestSections
+import com.ferret.ui.mapper.toResponseSections
+import com.ferret.ui.mapper.toTimingSections
+import com.ferret.ui.mapper.toWebSocketOverviewSections
 import com.ferret.ui.theme.FerretTypography
-import com.ferret.utils.formatBytes
-import com.ferret.utils.formatTime
 import com.ferret.viewModel.FerretDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -75,7 +74,15 @@ fun FerretDetailScreenContent(
     network: NetworkRecord?,
     onNavigateBack: () -> Unit,
 ) {
-    val tabs = FerretDetailTab.entries
+
+    if (network == null) return
+
+    val tabs: List<FerretNetworkDetailTab> =
+        if (network.isWebSocket) {
+            FerretNetworkDetailTab.WebSocket.entries
+        } else {
+            FerretNetworkDetailTab.Http.entries
+        }
 
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -92,7 +99,7 @@ fun FerretDetailScreenContent(
                         modifier = Modifier.statusBarsPadding(),
                         titleContent = {
                             Text(
-                                text = network?.path.orEmpty(),
+                                text = network.path,
                                 style = FerretTypography.titleMedium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -154,26 +161,45 @@ fun FerretDetailScreenContent(
                 beyondViewportPageCount = 1,
             ) { page ->
                 when (tabs[page]) {
-                    FerretDetailTab.OVERVIEW -> {
-                        FerretOverviewContent(
+
+                    FerretNetworkDetailTab.Http.OVERVIEW -> {
+                        FerretHttpOverviewContent(
                             network = network,
                         )
                     }
 
-                    FerretDetailTab.REQUEST -> {
+                    FerretNetworkDetailTab.Http.REQUEST -> {
                         FerretRequestContent(
                             network = network,
                         )
                     }
 
-                    FerretDetailTab.RESPONSE -> {
+                    FerretNetworkDetailTab.Http.RESPONSE -> {
                         FerretResponseContent(
                             network = network,
                         )
                     }
 
-                    FerretDetailTab.TIMING -> {
+                    FerretNetworkDetailTab.Http.TIMING -> {
                         FerretTimingContent(
+                            network = network,
+                        )
+                    }
+
+                    FerretNetworkDetailTab.WebSocket.OVERVIEW -> {
+                        FerretWebSocketOverviewContent(
+                            network = network,
+                        )
+                    }
+
+                    FerretNetworkDetailTab.WebSocket.REQUEST -> {
+                        FerretRequestContent(
+                            network = network,
+                        )
+                    }
+
+                    FerretNetworkDetailTab.WebSocket.RESPONSE -> {
+                        FerretResponseContent(
                             network = network,
                         )
                     }
@@ -187,7 +213,7 @@ fun FerretDetailScreenContent(
 @Composable
 fun FerretDetailTabSelector(
     pagerState: PagerState,
-    tabs: List<FerretDetailTab>,
+    tabs: List<FerretNetworkDetailTab>,
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -216,7 +242,6 @@ fun FerretDetailTabSelector(
         )
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -269,323 +294,96 @@ private fun FerretDetailTabItem(
 }
 
 @Composable
-internal fun FerretOverviewContent(
-    network: NetworkRecord?,
+internal fun FerretHttpOverviewContent(
+    network: NetworkRecord,
 ) {
-    if (network == null) return
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            FerretCard(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = 3.dp,
-            ) {
-                FerretSectionTitle(
-                    title = "General",
-                )
-
-                FerretKeyValueRow(
-                    key = "URL",
-                    value = network.url,
-                )
-
-                FerretKeyValueRow(
-                    key = "Host",
-                    value = network.host,
-                )
-
-                FerretKeyValueRow(
-                    key = "Path",
-                    value = network.path,
-                )
-
-                FerretKeyValueRow(
-                    key = "Protocol",
-                    value = network.protocol,
-                )
-
-                FerretKeyValueRow(
-                    key = "Method",
-                    value = network.method.orEmpty(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Started",
-                    value = network.requestDate.formatTime(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Finished",
-                    value = network.responseDate?.formatTime() ?: "",
-                )
-
-                FerretKeyValueRow(
-                    key = "Duration",
-                    value = network.tookMs
-                        ?.let { "$it ms" }
-                        ?: "—",
-                )
-
-                FerretKeyValueRow(
-                    key = "TLS",
-                    value = buildTlsInfo(network),
-                )
-            }
-        }
-
-        item {
-            FerretCard(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = 3.dp,
-            ) {
-                FerretSectionTitle(
-                    title = "Sizes",
-                )
-
-                FerretKeyValueRow(
-                    key = "Request Payload",
-                    value = network.requestPayloadSize.formatBytes(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Response Payload",
-                    value = network.responsePayloadSize.formatBytes(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Total Transfer",
-                    value = (network.requestPayloadSize + network.responsePayloadSize).formatBytes(),
-                )
-            }
-        }
-    }
+    FerretDetailContent(
+        sections = network.toHttpOverviewSections(),
+    )
 }
 
 @Composable
 internal fun FerretRequestContent(
-    network: NetworkRecord?,
+    network: NetworkRecord,
 ) {
-    if (network == null) return
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            FerretCard(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = 3.dp,
-            ) {
-                FerretSectionTitle(
-                    title = "Request",
-                )
-
-                FerretKeyValueRow(
-                    key = "Method",
-                    value = network.method.orEmpty(),
-                )
-
-                FerretKeyValueRow(
-                    key = "URL",
-                    value = network.url,
-                )
-
-                FerretKeyValueRow(
-                    key = "Content Type",
-                    value = network.requestContentType ?: "—",
-                )
-
-                FerretKeyValueRow(
-                    key = "Payload Size",
-                    value = network.requestPayloadSize.formatBytes(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Headers Size",
-                    value = network.requestHeadersSize.toLong().formatBytes(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Encoded",
-                    value = if (network.isRequestBodyEncoded) {
-                        "Yes"
-                    } else {
-                        "No"
-                    },
-                )
+    FerretDetailContent(
+        sections = network.toRequestSections(),
+        additionalContent = {
+            if (network.requestHeaders.isNotEmpty()) {
+                item {
+                    FerretHeadersCard(
+                        title = "Headers",
+                        headers = network.requestHeaders,
+                    )
+                }
             }
-        }
-
-        item {
-            FerretHeadersCard(
-                title = "Headers",
-                headers = network.requestHeaders,
-            )
-        }
-
-        network.requestBody?.let { body ->
-            item {
-                FerretBodyCard(
-                    title = "Request Body",
-                    body = body,
-                    encoded = network.isRequestBodyEncoded,
-                    contentType = network.requestContentType
-                )
-            }
-        }
-    }
+            network.requestBody
+                ?.takeIf { body ->
+                    body.isNotBlank()
+                }
+                ?.let { body ->
+                    item {
+                        FerretBodyCard(
+                            title = "Request Body",
+                            body = body,
+                            encoded = network.isRequestBodyEncoded,
+                            contentType = network.requestContentType,
+                        )
+                    }
+                }
+        },
+    )
 }
 
 
 @Composable
 internal fun FerretResponseContent(
-    network: NetworkRecord?,
+    network: NetworkRecord,
 ) {
-    if (network == null) return
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            FerretCard(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = 3.dp,
-            ) {
-                FerretSectionTitle(
-                    title = "Response",
-                )
-
-                FerretKeyValueRow(
-                    key = "Status",
-                    value = buildString {
-                        append(network.responseCode ?: "—")
-
-                        network.responseMessage?.let {
-                            append(" ")
-                            append(it)
-                        }
-                    },
-                )
-
-                FerretKeyValueRow(
-                    key = "Content Type",
-                    value = network.responseContentType ?: "—",
-                )
-
-                FerretKeyValueRow(
-                    key = "Payload Size",
-                    value = network.responsePayloadSize.formatBytes(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Headers Size",
-                    value = network.responseHeadersSize.toLong().formatBytes(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Encoded",
-                    value = if (network.isResponseBodyEncoded) {
-                        "Yes"
-                    } else {
-                        "No"
-                    },
-                )
-
-                network.error?.let { error ->
-                    FerretKeyValueRow(
-                        key = "Error",
-                        value = error,
+    FerretDetailContent(
+        sections = network.toResponseSections(),
+        additionalContent = {
+            if (network.responseHeaders.isNotEmpty()) {
+                item {
+                    FerretHeadersCard(
+                        title = "Headers",
+                        headers = network.requestHeaders,
                     )
                 }
             }
-        }
 
-        item {
-            FerretHeadersCard(
-                title = "Headers",
-                headers = network.responseHeaders,
-            )
-        }
-
-        network.responseBody?.let { body ->
-            item {
-                FerretBodyCard(
-                    title = "Response Body",
-                    body = body,
-                    encoded = network.isResponseBodyEncoded,
-                    contentType = network.responseContentType,
-                )
-            }
-        }
-    }
+            network.responseBody
+                ?.takeIf { body ->
+                    body.isNotBlank()
+                }
+                ?.let { body ->
+                    item {
+                        FerretBodyCard(
+                            title = "Response Body",
+                            body = body,
+                            encoded = network.isResponseBodyEncoded,
+                            contentType = network.responseContentType,
+                        )
+                    }
+                }
+        },
+    )
 }
 
 @Composable
 internal fun FerretTimingContent(
-    network: NetworkRecord?,
-) {
-    if (network == null) return
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            FerretCard(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = 3.dp,
-            ) {
-                FerretSectionTitle(
-                    title = "Timing",
-                )
-
-                FerretKeyValueRow(
-                    key = "Request Started",
-                    value = (network.requestDate).formatTime(),
-                )
-
-                FerretKeyValueRow(
-                    key = "Response Finished",
-                    value = network.responseDate?.formatTime() ?: "",
-                )
-
-                FerretKeyValueRow(
-                    key = "Total Duration",
-                    value = network.tookMs
-                        ?.let { "$it ms" }
-                        ?: "—",
-                )
-            }
-        }
-    }
-}
-private fun buildTlsInfo(
     network: NetworkRecord,
-): String {
-    val tlsVersion = network.responseTlsVersion
-    val cipherSuite = network.responseCipherSuite
+) {
+    FerretDetailContent(
+        sections = network.toTimingSections(),
+    )
+}
 
-    return when {
-        tlsVersion != null && cipherSuite != null -> {
-            "$tlsVersion / $cipherSuite"
-        }
-
-        tlsVersion != null -> tlsVersion
-
-        cipherSuite != null -> cipherSuite
-
-        else -> "—"
-    }
+@Composable
+internal fun FerretWebSocketOverviewContent(
+    network: NetworkRecord,
+) {
+    FerretDetailContent(
+        sections = network.toWebSocketOverviewSections(),
+    )
 }

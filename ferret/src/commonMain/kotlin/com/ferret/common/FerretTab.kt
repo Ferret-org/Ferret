@@ -6,20 +6,24 @@ enum class FerretTab(val title: String) {
     WEBSOCKET("WebSockets")
 }
 
-enum class FerretDetailTab(
-    val title: String,
-) {
-    OVERVIEW("Overview"),
-    REQUEST("Request"),
-    RESPONSE("Response"),
-    TIMING("Timing"),
-}
+sealed interface FerretNetworkDetailTab {
 
-enum class FerretWebSocketDetailTab(
-    val title: String,
-) {
-    OVERVIEW("Overview"),
-    MESSAGES("Messages"),
-    HEADERS("Headers"),
-    TIMING("Timing"),
+    val title: String
+
+    enum class Http(
+        override val title: String,
+    ) : FerretNetworkDetailTab {
+        OVERVIEW("Overview"),
+        REQUEST("Request"),
+        RESPONSE("Response"),
+        TIMING("Timing"),
+    }
+
+    enum class WebSocket(
+        override val title: String,
+    ) : FerretNetworkDetailTab {
+        OVERVIEW("Overview"),
+        REQUEST("Request"),
+        RESPONSE("Response"),
+    }
 }
