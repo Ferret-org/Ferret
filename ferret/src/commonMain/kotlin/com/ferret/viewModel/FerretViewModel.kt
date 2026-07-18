@@ -59,21 +59,11 @@ class FerretViewModel(
             }
 
             FerretTab.HTTP -> {
-                networkRecords.filter {
-                    !it.protocol.equals(
-                        "WS",
-                        ignoreCase = true,
-                    )
-                }
+                networkRecords.filter { !it.isWebSocket }
             }
 
             FerretTab.WEBSOCKET -> {
-                networkRecords.filter {
-                    it.protocol.equals(
-                        "WS",
-                        ignoreCase = true,
-                    )
-                }
+                networkRecords.filter { it.isWebSocket }
             }
         }
 

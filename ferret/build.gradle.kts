@@ -67,6 +67,10 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.activity.compose)
         }
+
+        nativeMain.dependencies {
+            implementation(libs.ktor.client.websockets)
+        }
     }
 }
 

@@ -33,10 +33,10 @@ interface TransactionDao {
             responseBody         = :responseBody,
             responseTlsVersion   = :responseTlsVersion,
             responseCipherSuite  = :responseCipherSuite
-        WHERE sessionId = :sessionId
+        WHERE id = :id
     """)
     suspend fun updateResponse(
-        sessionId: String,
+        id: Long,
         responseDate: Long,
         tookMs: Long,
         responseCode: Int,
@@ -55,38 +55,14 @@ interface TransactionDao {
         SET responseDate = :responseDate,
             tookMs       = :tookMs,
             error        = :error
-        WHERE sessionId = :sessionId
+        WHERE id = :id
     """)
     suspend fun updateError(
-        sessionId: String,
+        id: Long,
         responseDate: Long,
         tookMs: Long,
         error: String?,
     )
-
-    @Query("""
-        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
-        SET responseBody        = :responseBody,
-            responsePayloadSize = :responsePayloadSize
-        WHERE sessionId = :sessionId
-    """)
-    suspend fun updateWsFrameIn(sessionId: String, responseBody: String?, responsePayloadSize: Long)
-
-    @Query("""
-        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
-        SET requestBody        = :requestBody,
-            requestPayloadSize = :requestPayloadSize
-        WHERE sessionId = :sessionId
-    """)
-    suspend fun updateWsFrameOut(sessionId: String, requestBody: String?, requestPayloadSize: Long)
-
-    @Query("""
-        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
-        SET responseDate = :responseDate,
-            tookMs       = :tookMs
-        WHERE sessionId = :sessionId
-    """)
-    suspend fun updateWsClose(sessionId: String, responseDate: Long, tookMs: Long)
 
     @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}")
     suspend fun clear()

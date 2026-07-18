@@ -1,7 +1,5 @@
 package com.ferret.intercept
 
-import android.content.Context
-import com.ferret.AndroidContextHolder
 import com.ferret.FerretConfiguration
 import com.ferret.FerretSdk
 import com.ferret.model.Header
@@ -31,18 +29,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.io.readByteArray
-import java.util.UUID
+import platform.Foundation.NSUUID
 
 object Ferret {
     class Config {
-        lateinit var context: Context
         var configuration: FerretConfiguration = FerretConfiguration()
     }
 }
 
 fun HttpClientConfig<*>.install(ferret: Ferret, block: Ferret.Config.() -> Unit) {
     val config = Ferret.Config().apply(block)
-    AndroidContextHolder.context = config.context.applicationContext
     InitializeFerretUseCase(config.configuration).execute()
     install(WebSockets)
     install(FerretMonitorPlugin)
@@ -52,9 +48,9 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
 
     override val key: AttributeKey<FerretMonitorPlugin> = AttributeKey("FerretMonitor")
 
-    val appSessionId: String = UUID.randomUUID().toString()
+    val appSessionId: String = NSUUID().UUIDString
 
-    private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val ioScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private const val MAX_BODY_BYTES = 65_536
 
     override fun prepare(block: Unit.() -> Unit): FerretMonitorPlugin = this
@@ -64,13 +60,14 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
 
         scope.plugin(HttpSend).intercept { request ->
             if (request.url.protocol.name.startsWith("ws", ignoreCase = true) ||
-                request.headers[HttpHeaders.Upgrade]?.lowercase() == "websocket") {
+                request.headers[HttpHeaders.Upgrade]?.lowercase() == "websocket"
+            ) {
                 return@intercept execute(request)
             }
 
             val useCase = runCatching { FerretSdk.transactionRepository }
                 .getOrNull()?.let(::SaveTransactionUseCase)
-            val startTime = System.currentTimeMillis()
+            val startTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
             val requestHeaders = request.headers.build().entries()
                 .flatMap { (key, values) -> values.map { Header(key, it) } }
             val requestBodySize = (request.body as? OutgoingContent.ByteArrayContent)
@@ -101,7 +98,7 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
             try {
                 val call = execute(request)
                 val savedCall = call.save()
-                val endTime = System.currentTimeMillis()
+                val endTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 val responseBodyText = savedCall.response.rawContent
                     .readRemaining().readByteArray()
                     .decodeToString().take(MAX_BODY_BYTES)
@@ -131,7 +128,7 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
 
                 savedCall
             } catch (e: Exception) {
-                val endTime = System.currentTimeMillis()
+                val endTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 ioScope.launch {
                     useCase?.saveError(
                         id = rowId,

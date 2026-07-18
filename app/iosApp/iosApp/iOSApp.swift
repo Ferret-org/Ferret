@@ -33,10 +33,6 @@ private func requestNotificationPermission() async {
             )
 
         print("Notification permission granted: \(granted)")
-
-        if granted {
-            IosNotificationTest.shared.show()
-        }
     } catch {
         print(
             "Notification permission error: \(error.localizedDescription)"

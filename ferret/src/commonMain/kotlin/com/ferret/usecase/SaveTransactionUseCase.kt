@@ -9,12 +9,11 @@ internal class SaveTransactionUseCase(
     private val repository: TransactionRepository
 ) {
 
-    suspend fun saveRequest(transaction: NetworkRecord) {
+    suspend fun saveRequest(transaction: NetworkRecord): Long =
         repository.insert(transaction)
-    }
 
     suspend fun saveResponse(
-        sessionId: String,
+        id: Long,
         responseDate: Long,
         tookMs: Long,
         responseCode: Int,
@@ -27,7 +26,7 @@ internal class SaveTransactionUseCase(
         responseCipherSuite: String?,
     ) {
         repository.updateResponse(
-            sessionId = sessionId,
+            id = id,
             responseDate = responseDate,
             tookMs = tookMs,
             responseCode = responseCode,
@@ -43,13 +42,13 @@ internal class SaveTransactionUseCase(
     }
 
     suspend fun saveError(
-        sessionId: String,
+        id: Long,
         responseDate: Long,
         tookMs: Long,
         error: String?,
     ) {
         repository.updateError(
-            sessionId = sessionId,
+            id = id,
             responseDate = responseDate,
             tookMs = tookMs,
             error = error,

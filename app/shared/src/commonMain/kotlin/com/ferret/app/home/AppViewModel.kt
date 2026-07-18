@@ -70,8 +70,8 @@ class AppViewModel(
     }
 
     companion object {
-        //        private const val WS_URL = "wss://echo.websocket.org"
-        private const val WS_URL =
-            "wss://dev-tusk.bebetta.in/ws?token=eyJ0IjoiZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBaQ0k2SWpJMU5UYzBJaXdpZG1WeWMybHZia052WkdVaU9qTXpPU3dpYVhOeklqb2lkSFZ6YXlJc0ltVjRjQ0k2TVRjNE16azFNVE0yTlN3aWJtSm1Jam94Tnpnek56YzROVFkxTENKcFlYUWlPakUzT0RNM056ZzFOalY5LnhNTDVRWnpxNlBlMXFscWpVeTFLNU1YLS1UbUhsVUZPZUdLRTZfa0p5cU0iLCJkIjoiZFptdjh0NDRUZXlfYXdIZ1NyalcybDpBUEE5MWJIbmUweVRsRjdPVnFiRVVzczRxN1ZkM2NhS25ySGRuREpSZHdEQ0JMb3p5bl83dGlOdnhpdFNCNFBoZzc4SkdRSWVzTDAwNnItUzR5bEdLeGNob19ZNnRhSGtaQ083alloQ3VBZUpDVEg4NDdwX1RlOCIsImN2IjoiMzM5IiwiYSI6Imh0dHBzOi8vbWVkaWEuYmViZXR0YS5pbi9wcm9maWxlX2ltYWdlcy9yb2JvdF8yNS53ZWJwIiwidSI6InVzZXJfdGh6em9hOHNoeDEifQ=="
+                private const val WS_URL = "wss://echo.websocket.org"
+//        private const val WS_URL =
+//            "wss://dev-tusk.bebetta.in/ws?token=eyJ0IjoiZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBaQ0k2SWpJMU5UYzBJaXdpZG1WeWMybHZia052WkdVaU9qTXpPU3dpYVhOeklqb2lkSFZ6YXlJc0ltVjRjQ0k2TVRjNE16azFNVE0yTlN3aWJtSm1Jam94Tnpnek56YzROVFkxTENKcFlYUWlPakUzT0RNM056ZzFOalY5LnhNTDVRWnpxNlBlMXFscWpVeTFLNU1YLS1UbUhsVUZPZUdLRTZfa0p5cU0iLCJkIjoiZFptdjh0NDRUZXlfYXdIZ1NyalcybDpBUEE5MWJIbmUweVRsRjdPVnFiRVVzczRxN1ZkM2NhS25ySGRuREpSZHdEQ0JMb3p5bl83dGlOdnhpdFNCNFBoZzc4SkdRSWVzTDAwNnItUzR5bEdLeGNob19ZNnRhSGtaQ083alloQ3VBZUpDVEg4NDdwX1RlOCIsImN2IjoiMzM5IiwiYSI6Imh0dHBzOi8vbWVkaWEuYmViZXR0YS5pbi9wcm9maWxlX2ltYWdlcy9yb2JvdF8yNS53ZWJwIiwidSI6InVzZXJfdGh6em9hOHNoeDEifQ=="
     }
 }

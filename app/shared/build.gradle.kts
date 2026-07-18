@@ -42,7 +42,6 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.android)
-            implementation(libs.ferret.lib)
         }
         commonMain {
             // Expose the Ktorfit KSP-generated code (createCoursesService, etc.) to every target.
@@ -80,7 +79,6 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
-            implementation(libs.ferret.lib)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
