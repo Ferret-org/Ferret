@@ -10,7 +10,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.ferret.AndroidContextHolder
+import com.ferret.FerretConfiguration
 import com.ferret.FerretSdk
+import com.ferret.usecase.InitializeFerretUseCase
 
 /**
  * Ferret-owned activity. Opens when the user taps the Ferret notification.
@@ -21,7 +24,12 @@ class FerretActivity : ComponentActivity() {
     override fun onCreate(
         savedInstanceState: Bundle?,
     ) {
+
         super.onCreate(savedInstanceState)
+        AndroidContextHolder.context = applicationContext
+        InitializeFerretUseCase(
+            configuration = FerretConfiguration()
+        ).execute()
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(

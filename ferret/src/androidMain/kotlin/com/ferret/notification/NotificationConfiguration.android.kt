@@ -13,5 +13,5 @@ actual class NotificationConfiguration(
 
     actual val defaultChannel: NotificationChannelSpec = NotificationChannelSpec(),
 
-    actual val defaultPriority: NotificationPriority = NotificationPriority.MIN,
+    actual val defaultPriority: NotificationPriority = NotificationPriority.HIGH,
 )
