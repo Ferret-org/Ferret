@@ -1,24 +1,15 @@
 package com.ferret.ui
 
 import android.app.AlertDialog
-import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.ferret.FerretSdk
 
 /**
@@ -32,7 +23,12 @@ class FerretActivity : ComponentActivity() {
     ) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                Color.TRANSPARENT,
+                Color.TRANSPARENT
+            )
+        )
 
         if (!FerretSdk.isInitialized) {
             showInitializationError()
@@ -63,6 +59,6 @@ class FerretActivity : ComponentActivity() {
 @Composable
 private fun FerretRoute() {
     FerretRoute(
-        modifier = Modifier,
+        modifier = Modifier.navigationBarsPadding(),
     )
 }

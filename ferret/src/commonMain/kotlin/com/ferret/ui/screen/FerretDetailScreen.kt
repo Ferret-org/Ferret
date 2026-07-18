@@ -347,7 +347,7 @@ internal fun FerretResponseContent(
                 item {
                     FerretHeadersCard(
                         title = "Headers",
-                        headers = network.requestHeaders,
+                        headers = network.responseHeaders,
                     )
                 }
             }

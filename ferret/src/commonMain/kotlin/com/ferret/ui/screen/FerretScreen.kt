@@ -1,10 +1,8 @@
 package com.ferret.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -22,12 +20,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,14 +30,12 @@ import com.ferret.common.FerretTab
 import com.ferret.ui.components.FerretNetworkCard
 import com.ferret.ui.components.FerretSearchBar
 import com.ferret.ui.theme.FerretTypography
-import com.ferret.viewModel.FerretDetailViewModel
 import com.ferret.viewModel.FerretViewModel
 
 @Composable
 fun FerretNetworkListScreen(
-    modifier: Modifier = Modifier,
     ferretViewModel: FerretViewModel,
-    onItemClick: (Long) -> Unit,
+    onItemClick: (Long) -> Unit
 ) {
 
     val ferretState by ferretViewModel.ferretState.collectAsStateWithLifecycle()
@@ -82,49 +73,44 @@ fun FerretNetworkListScreen(
                 }
             }
         ) { paddingValues ->
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
+            LazyColumn(
+                modifier = Modifier
                     .padding(paddingValues)
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
             ) {
-                LazyColumn(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                ) {
-                    ferretState.sessions.forEach { session ->
+                ferretState.sessions.forEach { session ->
 
-                        item(
-                            key = "session-${session.sessionId}",
-                        ) {
-                            FerretSessionHeader(
-                                sessionId = session.sessionId,
-                                requestCount = session.records.size,
-                            )
-                        }
+                    item(
+                        key = "session-${session.sessionId}",
+                    ) {
+                        FerretSessionHeader(
+                            sessionId = session.sessionId,
+                            requestCount = session.records.size,
+                        )
+                    }
 
-                        items(
-                            items = session.records,
-                            key = { record ->
-                                record.id
-                            },
-                        ) { ferretItem ->
-                            FerretNetworkCard(
-                                onClick = onItemClick,
-                                id = ferretItem.id,
-                                method = ferretItem.method.orEmpty(),
-                                path = ferretItem.path,
-                                host = ferretItem.host,
-                                responseCode = ferretItem.responseCode ?: 0,
-                                tookMs = ferretItem.tookMs ?: 0,
-                                requestDate = ferretItem.requestDate,
-                                responsePayloadSize = ferretItem.responsePayloadSize,
-                            )
-                        }
+                    items(
+                        items = session.records,
+                        key = { record ->
+                            record.id
+                        },
+                    ) { ferretItem ->
+                        FerretNetworkCard(
+                            onClick = onItemClick,
+                            id = ferretItem.id,
+                            method = ferretItem.method.orEmpty(),
+                            path = ferretItem.path,
+                            host = ferretItem.host,
+                            responseCode = ferretItem.responseCode ?: 0,
+                            tookMs = ferretItem.tookMs ?: 0,
+                            requestDate = ferretItem.requestDate,
+                            responsePayloadSize = ferretItem.responsePayloadSize,
+                        )
                     }
                 }
             }
         }
     }
-
 }
 
 
@@ -173,7 +159,7 @@ fun FerretTopBar(
     modifier: Modifier = Modifier,
     onDelete: () -> Unit,
 ) {
-    Row (
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
@@ -200,7 +186,6 @@ fun FerretTopBar(
         )
     }
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

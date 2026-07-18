@@ -1,11 +1,11 @@
 package com.ferret.utils
 
 import kotlinx.datetime.TimeZone
-import kotlin.time.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlin.time.Instant
 
 fun Long.formatTime(): String {
     val local = Instant
@@ -39,20 +39,22 @@ fun Long.formatBytes(): String = when {
 @OptIn(ExperimentalSerializationApi::class)
 private val prettyJson = Json {
     prettyPrint = true
-    prettyPrintIndent = "  "
+    prettyPrintIndent = "    "
 }
 
 fun formatBody(
     body: String,
     contentType: String?,
 ): String {
-    if (!contentType.isJsonContentType()) {
-        return body
-    }
+    val trimmed = body.trim()
+    val isJson = contentType.isJsonContentType() ||
+            trimmed.startsWith("{") ||
+            trimmed.startsWith("[")
+
+    if (!isJson) return body
 
     return try {
-        val jsonElement: JsonElement = Json.parseToJsonElement(body)
-
+        val jsonElement: JsonElement = Json.parseToJsonElement(trimmed)
         prettyJson.encodeToString(jsonElement)
     } catch (_: Exception) {
         body

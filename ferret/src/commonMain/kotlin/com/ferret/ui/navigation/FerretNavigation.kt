@@ -12,6 +12,6 @@ fun FerretNavigation(
 
     FerretNavGraph(
         navController = navController,
-        modifier = modifier,
+        modifier = modifier
     )
 }

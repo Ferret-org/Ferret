@@ -1,19 +1,34 @@
 package com.ferret.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ferret.model.Header
 import com.ferret.ui.theme.FerretTypography
+import com.ferret.utils.copyToClipboard
 import com.ferret.utils.formatBody
 
 private const val MAX_BODY_PREVIEW_LENGTH = 100_000
@@ -65,13 +80,38 @@ fun FerretHeadersCard(
     headers: List<Header>,
     modifier: Modifier = Modifier,
 ) {
+    val headersText = remember(headers) {
+        headers.joinToString("\n") { "${it.name}: ${it.value}" }
+    }
+
     FerretCard(
         modifier = modifier.fillMaxWidth(),
         elevation = 3.dp,
     ) {
-        FerretSectionTitle(
-            title = "$title (${headers.size})",
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "$title (${headers.size})",
+                style = FerretTypography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(
+                onClick = { copyToClipboard(headersText) },
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ContentCopy,
+                    contentDescription = "Copy headers",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        }
 
         if (headers.isEmpty()) {
             Text(
@@ -80,11 +120,15 @@ fun FerretHeadersCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
-            headers.forEach { header ->
-                FerretKeyValueRow(
-                    key = header.name,
-                    value = header.value,
-                )
+            SelectionContainer {
+                Column {
+                    headers.forEach { header ->
+                        FerretKeyValueRow(
+                            key = header.name,
+                            value = header.value,
+                        )
+                    }
+                }
             }
         }
     }
@@ -98,19 +142,9 @@ fun FerretBodyCard(
     encoded: Boolean? = null,
     modifier: Modifier = Modifier,
 ) {
-    val formattedBody = remember(
-        body,
-        contentType,
-        encoded,
-    ) {
-        if (encoded == true) {
-            body
-        } else {
-            formatBody(
-                body = body,
-                contentType = contentType,
-            )
-        }
+    val formattedBody = remember(body, contentType, encoded) {
+        if (encoded == true) body
+        else formatBody(body = body, contentType = contentType)
     }
 
     val displayBody = remember(formattedBody) {
@@ -125,19 +159,50 @@ fun FerretBodyCard(
 
     FerretCard(
         modifier = modifier.fillMaxWidth(),
-        elevation = 3.dp
+        elevation = 3.dp,
     ) {
-        FerretSectionTitle(
-            title = title,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = title,
+                style = FerretTypography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(
+                onClick = { copyToClipboard(formattedBody) },
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ContentCopy,
+                    contentDescription = "Copy body",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        }
 
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = displayBody,
-            style = FerretTypography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            softWrap = true,
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(12.dp)
+                .horizontalScroll(rememberScrollState()),
+        ) {
+            SelectionContainer {
+                Text(
+                    text = displayBody,
+                    style = FerretTypography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    softWrap = false,
+                )
+            }
+        }
 
         if (isTruncated) {
             Text(
