@@ -17,6 +17,7 @@ sealed class WebSocketEvent {
         val data: String,
         val sizeBytes: Long,
         val count: Int,
+        val url : String
     ) : WebSocketEvent()
 
     data class FrameSent(
@@ -26,11 +27,13 @@ sealed class WebSocketEvent {
         val data: String,
         val sizeBytes: Long,
         val count: Int,
+        val url : String
     ) : WebSocketEvent()
 
     data class Disconnected(
         override val connectionId: String,
         override val timestamp: Long,
         val tookMs: Long,
+        val url : String
     ) : WebSocketEvent()
 }

@@ -19,7 +19,7 @@ internal class TransactionRepositoryImpl(
         dao.update(transaction.toEntity())
 
     override suspend fun updateResponse(
-        sessionId: String,
+        id: Long,
         responseDate: Long,
         tookMs: Long,
         responseCode: Int,
@@ -32,7 +32,7 @@ internal class TransactionRepositoryImpl(
         responseTlsVersion: String?,
         responseCipherSuite: String?,
     ) = dao.updateResponse(
-        sessionId = sessionId,
+        id = id,
         responseDate = responseDate,
         tookMs = tookMs,
         responseCode = responseCode,
@@ -47,25 +47,16 @@ internal class TransactionRepositoryImpl(
     )
 
     override suspend fun updateError(
-        sessionId: String,
+        id: Long,
         responseDate: Long,
         tookMs: Long,
         error: String?,
     ) = dao.updateError(
-        sessionId = sessionId,
+        id = id,
         responseDate = responseDate,
         tookMs = tookMs,
         error = error,
     )
-
-    override suspend fun updateWsFrameIn(sessionId: String, responseBody: String?, responsePayloadSize: Long) =
-        dao.updateWsFrameIn(sessionId, responseBody, responsePayloadSize)
-
-    override suspend fun updateWsFrameOut(sessionId: String, requestBody: String?, requestPayloadSize: Long) =
-        dao.updateWsFrameOut(sessionId, requestBody, requestPayloadSize)
-
-    override suspend fun updateWsClose(sessionId: String, responseDate: Long, tookMs: Long) =
-        dao.updateWsClose(sessionId, responseDate, tookMs)
 
     override suspend fun delete(transaction: NetworkRecord) =
         dao.delete(transaction.toEntity())
