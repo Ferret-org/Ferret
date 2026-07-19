@@ -28,7 +28,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +44,7 @@ import com.ferret.model.NetworkRecord
 import com.ferret.ui.components.FerretBodyCard
 import com.ferret.ui.components.FerretDetailContent
 import com.ferret.ui.components.FerretHeadersCard
+import com.ferret.ui.components.FerretShareDialog
 import com.ferret.ui.components.FerretTopBar
 import com.ferret.ui.mapper.toHttpOverviewSections
 import com.ferret.ui.mapper.toRequestSections
@@ -47,6 +52,9 @@ import com.ferret.ui.mapper.toResponseSections
 import com.ferret.ui.mapper.toTimingSections
 import com.ferret.ui.mapper.toWebSocketOverviewSections
 import com.ferret.ui.theme.FerretTypography
+import com.ferret.utils.shareText
+import com.ferret.utils.toCurlCommand
+import com.ferret.utils.toShareText
 import com.ferret.viewModel.FerretDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -77,6 +85,8 @@ fun FerretDetailScreenContent(
 
     if (network == null) return
 
+    var showShareDialog by rememberSaveable { mutableStateOf(false) }
+
     val tabs: List<FerretNetworkDetailTab> =
         if (network.isWebSocket) {
             FerretNetworkDetailTab.WebSocket.entries
@@ -90,6 +100,14 @@ fun FerretDetailScreenContent(
     )
 
     val coroutineScope = rememberCoroutineScope()
+
+    if (showShareDialog) {
+        FerretShareDialog(
+            onShareCurl = { shareText(network.toCurlCommand()) },
+            onShareOverview = { shareText(network.toShareText()) },
+            onDismiss = { showShareDialog = false },
+        )
+    }
 
     MaterialTheme {
         Scaffold(
@@ -117,7 +135,7 @@ fun FerretDetailScreenContent(
                         },
                         actions = {
                             IconButton(
-                                onClick = {},
+                                onClick = { showShareDialog = true },
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Share,
