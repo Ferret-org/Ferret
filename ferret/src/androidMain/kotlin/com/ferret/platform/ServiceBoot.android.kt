@@ -4,6 +4,7 @@ import com.ferret.AndroidContextHolder
 import com.ferret.FerretConfiguration
 import com.ferret.notification.NotificationConfiguration
 import com.ferret.notification.NotificationKit
+import com.ferret.utils.FerretShortcut
 
 internal actual fun bootServices(configuration: FerretConfiguration) {
     NotificationKit.boot(
@@ -15,4 +16,6 @@ internal actual fun bootServices(configuration: FerretConfiguration) {
             defaultChannel = configuration.notifications.defaultChannel
         )
     )
+
+    FerretShortcut.create()
 }

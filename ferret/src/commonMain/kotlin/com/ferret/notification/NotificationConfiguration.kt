@@ -22,5 +22,5 @@ expect class NotificationConfiguration {
 data class NotificationChannelSpec(
     val id: String = NotificationDefaults.DEFAULT_CHANNEL_ID,
     val name: String = NotificationDefaults.DEFAULT_CHANNEL_NAME,
-    val priority: NotificationPriority = NotificationPriority.MIN,
+    val priority: NotificationPriority = NotificationPriority.HIGH,
 )

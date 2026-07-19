@@ -72,11 +72,7 @@ internal actual class NotificationController actual constructor(
         entries.forEach { inbox.addLine("${it.title}  ·  ${it.message}") }
         builder.setStyle(inbox)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder.setSubText(entries.size.toString())
-        } else {
-            builder.setNumber(entries.size)
-        }
+        builder.setSubText(entries.size.toString())
         return builder.build()
     }
 
