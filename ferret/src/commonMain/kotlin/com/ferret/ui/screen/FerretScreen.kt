@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,8 +20,12 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,13 +46,16 @@ fun FerretNetworkListScreen(
     val ferretState by ferretViewModel.ferretState.collectAsStateWithLifecycle()
     val query by ferretViewModel.searchQuery.collectAsStateWithLifecycle()
 
+    var showDeleteDialog by rememberSaveable() { mutableStateOf(false) }
 
     MaterialTheme {
         Scaffold(
             topBar = {
                 Column {
                     FerretTopBar(
-                        onDelete = ferretViewModel::clearDatabase // TODO Dialog()
+                        onDelete = {
+                            showDeleteDialog = true
+                        }
                     )
 
                     FerretTabSelector(
@@ -67,7 +75,7 @@ fun FerretNetworkListScreen(
                             FerretTab.HTTP -> "Search HTTP requests..."
                             FerretTab.WEBSOCKET -> "Search WebSocket connections..."
                         },
-                        onFilterClick = {},
+                        onFilterClick = null,
                         filterActive = ferretState.hasActiveFilters
                     )
                 }
@@ -95,12 +103,31 @@ fun FerretNetworkListScreen(
                             record.id
                         },
                     ) { ferretItem ->
+                        val displayPath = when {
+                            ferretItem.path.isNotBlank() -> ferretItem.path
+                            !ferretItem.requestBody.isNullOrBlank() -> ferretItem.requestBody
+                            !ferretItem.responseBody.isNullOrBlank() -> ferretItem.responseBody
+                            else -> "WebSocket"
+                        }
+
+                        val displayHost = when {
+                            ferretItem.host.isNotBlank() -> ferretItem.host
+
+                            !ferretItem.requestBody.isNullOrBlank() ->
+                                ferretItem.requestBody
+
+                            !ferretItem.responseBody.isNullOrBlank() ->
+                                ferretItem.responseBody
+
+                            else -> "WebSocket"
+                        }
+
                         FerretNetworkCard(
                             onClick = onItemClick,
                             id = ferretItem.id,
                             method = ferretItem.method.orEmpty(),
-                            path = ferretItem.path,
-                            host = ferretItem.host,
+                            path = displayPath,
+                            host = displayHost,
                             responseCode = ferretItem.responseCode ?: 0,
                             tookMs = ferretItem.tookMs ?: 0,
                             requestDate = ferretItem.requestDate,
@@ -108,6 +135,18 @@ fun FerretNetworkListScreen(
                         )
                     }
                 }
+            }
+
+            if (showDeleteDialog) {
+                DeleteConfirmationDialog(
+                    onConfirm = {
+                        showDeleteDialog = false
+                        ferretViewModel.clearDatabase()
+                    },
+                    onDismiss = {
+                        showDeleteDialog = false
+                    }
+                )
             }
         }
     }
@@ -136,13 +175,6 @@ fun FerretSessionHeader(
                 text = "Session",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            Text(
-                text = sessionId.take(3),
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -216,4 +248,37 @@ fun FerretTabSelector(
             )
         }
     }
+}
+
+
+@Composable
+fun DeleteConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Delete all network logs?")
+        },
+        text = {
+            Text(
+                "This will permanently delete all captured network requests and sessions. This action cannot be undone."
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm
+            ) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
 }
