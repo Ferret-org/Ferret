@@ -118,7 +118,7 @@ mavenPublishing {
             developer {
                 id.set("Nagarjuna0033")
                 name.set("Nagarjuna Banda")
-                url.set("https://github.com/Nagarajuna0033")
+                url.set("https://github.com/Nagarjuna0033")
             }
         }
 
