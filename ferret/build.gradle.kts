@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.ferret"
-version = "0.1.0-LOCAL"
+version = "1.0.0"
 
 kotlin {
     android {
@@ -85,13 +85,48 @@ room {
     schemaDirectory(layout.projectDirectory.dir("schemas"))
 }
 
-group = "com.ferret"
-version = "0.1.0-LOCAL"
-
 mavenPublishing {
     coordinates(
         groupId = "com.ferret",
-        artifactId = "ferret-lib",
+        artifactId = "ferret",
         version = version.toString()
     )
+
+    publishToMavenCentral()
+
+    signAllPublications()
+
+    pom {
+        name.set("Ferret")
+        description.set("KMP network inspection library")
+        inceptionYear.set("2026")
+        url.set("https://github.com/Ferret-org/ferret")
+
+        licenses {
+            license {
+                name.set("Apache-2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0")
+            }
+        }
+
+        developers {
+            developer {
+                id = "Aditya-gupta99"
+                name = "Aditya Gupta"
+                url = "https://github.com/Aditya-gupta99"
+            }
+            developer {
+                id.set("Nagarjuna0033")
+                name.set("Nagarjuna Banda")
+                url.set("https://github.com/Nagarajuna0033")
+            }
+        }
+
+        scm {
+            url.set("https://github.com/Ferret-org/ferret")
+            connection.set("scm:git:https://github.com/Ferret-org/ferret.git")
+            developerConnection.set("scm:git:ssh://git@github.com:Ferret-org/ferret.git")
+        }
+    }
+
 }
