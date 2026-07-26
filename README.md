@@ -47,7 +47,7 @@ Ferret is distributed through Maven Central. Add the dependency to your shared/c
 ferret = "1.0.0"
 
 [libraries]
-ferret = { module = "com.ferret:ferret", version.ref = "ferret" }
+ferret = { module = "io.github.ferret-org:ferret", version.ref = "ferret" }
 ```
 
 **`build.gradle.kts`**
