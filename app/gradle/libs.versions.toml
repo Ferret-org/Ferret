@@ -28,7 +28,7 @@ koinAnnotationsVersion = "4.2.2"
 kotlinxDatetime = "0.8.0"
 
 [libraries]
-ferret = { module = "com.ferret:ferret", version.ref = "ferret" }
+ferret = { module = "io.github.ferret-org:ferret", version.ref = "ferret" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
