@@ -1,12 +1,12 @@
 package com.ferret.usecase
 
-import com.ferret.database.converter.TransactionConverters
+import com.ferret.database.converter.NetworkRecordConverters
 import com.ferret.model.Header
 import com.ferret.model.NetworkRecord
-import com.ferret.repository.TransactionRepository
+import com.ferret.repository.NetworkRecordRepository
 
-internal class SaveTransactionUseCase(
-    private val repository: TransactionRepository
+internal class SaveNetworkRecordUseCase(
+    private val repository: NetworkRecordRepository
 ) {
 
     suspend fun saveRequest(transaction: NetworkRecord): Long =
@@ -33,7 +33,7 @@ internal class SaveTransactionUseCase(
             responseMessage = responseMessage,
             responsePayloadSize = responsePayloadSize,
             responseContentType = responseContentType,
-            responseHeaders = TransactionConverters.json.encodeToString(responseHeaders),
+            responseHeaders = NetworkRecordConverters.json.encodeToString(responseHeaders),
             responseHeadersSize = responseHeaders.size,
             responseBody = responseBody,
             responseTlsVersion = responseTlsVersion,

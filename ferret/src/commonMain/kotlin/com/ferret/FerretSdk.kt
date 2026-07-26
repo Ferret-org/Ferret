@@ -1,6 +1,6 @@
 package com.ferret
 
-import com.ferret.repository.TransactionRepository
+import com.ferret.repository.NetworkRecordRepository
 
 object FerretSdk {
 
@@ -9,10 +9,10 @@ object FerretSdk {
     internal val isInitialized: Boolean
         get() = repository != null
 
-    val transactionRepository: TransactionRepository
+    val networkRecordRepository: NetworkRecordRepository
         get() = checkNotNull(repository) {
             "FerretSdk is not initialized. Call FerretSdk.initialize(context) first."
-        }.transactionRepository
+        }.networkRecordRepository
 
 }
 

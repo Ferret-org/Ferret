@@ -7,7 +7,7 @@ import com.ferret.database.DatabaseConstants
 import com.ferret.model.Header
 
 @Entity(
-    tableName = DatabaseConstants.TRANSACTIONS_TABLE,
+    tableName = DatabaseConstants.NETWORK_RECORD_TABLE,
     indices = [
         Index("sessionId"),
         Index("requestDate"),

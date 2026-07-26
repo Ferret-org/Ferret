@@ -1,8 +1,8 @@
 package com.ferret
 
-import com.ferret.repository.TransactionRepository
+import com.ferret.repository.NetworkRecordRepository
 
 
 internal expect class FerretRepository {
-    val transactionRepository: TransactionRepository
+    val networkRecordRepository: NetworkRecordRepository
 }

@@ -1,13 +1,13 @@
 package com.ferret
 
 import com.ferret.model.NetworkRecord
-import com.ferret.repository.TransactionRepository
+import com.ferret.repository.NetworkRecordRepository
 import kotlinx.coroutines.flow.first
 import kotlin.time.Clock
 
 object DatabaseTester {
 
-    suspend fun run(repository: TransactionRepository) {
+    suspend fun run(repository: NetworkRecordRepository) {
         val now = Clock.System.now().epochSeconds * 1000
 
         val id = repository.insert(

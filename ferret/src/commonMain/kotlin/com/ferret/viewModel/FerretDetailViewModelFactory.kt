@@ -4,13 +4,13 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.ferret.FerretSdk
-import com.ferret.usecase.GetTransactionByIdUseCase
+import com.ferret.usecase.GetNetworkRecordByIdUseCase
 
 val ferretDetailViewModelFactory = viewModelFactory {
     initializer {
         FerretDetailViewModel(
-            GetTransactionByIdUseCase(
-                FerretSdk.transactionRepository
+            GetNetworkRecordByIdUseCase(
+                FerretSdk.networkRecordRepository
             ),
             savedStateHandle = createSavedStateHandle()
         )

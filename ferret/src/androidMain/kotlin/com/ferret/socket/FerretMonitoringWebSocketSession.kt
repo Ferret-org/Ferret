@@ -28,7 +28,7 @@ internal class FerretMonitoringWebSocketSession(
     private val connectedAt: Long = System.currentTimeMillis()
 
     private val useCase: SaveWebSocketEventUseCase?
-        get() = FerretSdk.transactionRepository?.let(::SaveWebSocketEventUseCase)
+        get() = FerretSdk.networkRecordRepository?.let(::SaveWebSocketEventUseCase)
 
     private val _outgoing: Channel<Frame> = Channel(Channel.UNLIMITED)
     private val _incoming: ReceiveChannel<Frame>

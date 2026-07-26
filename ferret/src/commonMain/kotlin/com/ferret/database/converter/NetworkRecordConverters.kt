@@ -4,7 +4,7 @@ import androidx.room.TypeConverter
 import com.ferret.model.Header
 import kotlinx.serialization.json.Json
 
-object TransactionConverters {
+object NetworkRecordConverters {
 
     val json = Json {
         ignoreUnknownKeys = true
