@@ -1,5 +1,7 @@
 package com.ferret.app.network
 
+import com.ferret.FerretConfiguration
+import com.ferret.NotificationConfiguration
 import com.ferret.intercept.Ferret
 import com.ferret.intercept.install
 import io.ktor.client.HttpClient
@@ -14,6 +16,13 @@ actual fun createHttpClient(json: Json): HttpClient = HttpClient(Darwin) {
             waitsForConnectivity = true
         }
     }
-    install(Ferret) {}
+    install(Ferret) {
+        configuration = FerretConfiguration(
+            notifications = NotificationConfiguration(
+                requestPermission = true,
+            ),
+            retentionDurationHours = 12
+        )
+    }
     configureShared(json)
 }

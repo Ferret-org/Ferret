@@ -21,15 +21,10 @@ import com.ferret.usecase.InitializeFerretUseCase
  */
 class FerretActivity : ComponentActivity() {
 
-    override fun onCreate(
-        savedInstanceState: Bundle?,
-    ) {
-
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidContextHolder.context = applicationContext
-        InitializeFerretUseCase(
-            configuration = FerretConfiguration()
-        ).execute()
+        InitializeFerretUseCase(configuration = FerretConfiguration()).execute()
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
