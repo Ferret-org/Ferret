@@ -2,6 +2,8 @@
 
 # Ferret
 
+<img src="ferret.jpg" width="500" height="500" alt="Ferret logo" />
+
 **Ferret out every HTTP request and WebSocket message your app sends and receives.**
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.ferret-org/ferret?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.ferret-org/ferret)
@@ -13,12 +15,8 @@
 
 </div>
 
-
 ---
 
-<table border="0" cellspacing="0" cellpadding="0">
-<tr>
-<td valign="top">
 ### 📑 Table of Contents
 
 - [Getting Started 👣](#getting-started)
@@ -31,12 +29,6 @@
 - [Sample App 📱](#sample-app)
 - [FAQ ❓](#faq)
 - [License 📄](#license)
-</td>
-<td valign="top" align="center">
-<img src="ferret.jpg" width="500" height="500" alt="Ferret logo" />
-</td>
-</tr>
-</table>
 
 ---
 
