@@ -123,7 +123,10 @@ class FerretViewModel(
             searchQuery = query,
             sessions = pagedSessions,
             hasMore = allSessions.size > pagedSessions.size,
+            isLoading = false
         )
+    }.onStart {
+        emit(FerretUiState(isLoading = true))
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -143,6 +146,7 @@ data class FerretUiState(
     val searchQuery: String = "",
     val hasActiveFilters: Boolean = false,
     val hasMore: Boolean = false,
+    val isLoading: Boolean = true,
 )
 
 data class NetworkSession(
