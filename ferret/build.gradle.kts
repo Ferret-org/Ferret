@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-group = "com.ferret"
+group = "io.github.ferret-org"
 version = "1.0.0"
 
 kotlin {
@@ -65,7 +65,6 @@ kotlin {
 
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.androidx.activity.compose)
         }
 
         nativeMain.dependencies {
@@ -87,12 +86,12 @@ room {
 
 mavenPublishing {
     coordinates(
-        groupId = "com.ferret",
+        groupId = "io.github.ferret-org",
         artifactId = "ferret",
         version = version.toString()
     )
 
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
 
     signAllPublications()
 
