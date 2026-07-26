@@ -2,7 +2,7 @@
 
 # Ferret
 
-<img src="ferret.jpg" width="500" height="500" alt="Ferret logo" />
+<img src="docs/ferret.png" width="500" height="500" alt="Ferret logo" />
 
 **Ferret out every HTTP request and WebSocket message your app sends and receives.**
 
@@ -348,3 +348,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+## Show your support
+Give a ⭐️ if this project helped you!

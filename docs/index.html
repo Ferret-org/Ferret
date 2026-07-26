@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Ferret SDK – Documentation</title>
+    <script>
+        // Strip the hash BEFORE the browser can scroll to it.
+        // Save it so the navigation JS can restore the correct page.
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.__startPage = location.hash ? location.hash.slice(1) : 'introduction';
+        history.replaceState(null, '', location.pathname + location.search);
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+          --bg:          #0D1117;
+          --bg2:         #161B22;
+          --bg3:         #1C2128;
+          --text:        #E6EDF3;
+          --text2:       #8B949E;
+          --text3:       #656D76;
+          --accent:      #8B5CF6;
+          --accent2:     #A78BFA;
+          --accent-dim:  rgba(139,92,246,.10);
+          --border:      #252C36;
+          --border2:     #1C2230;
+          --border-div:  rgba(255,255,255,0.06);
+          --sidebar-w:   300px;
+          --header-h:    58px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          background:
+            radial-gradient(ellipse 900px 700px at 85% 12%, rgba(139,92,246,0.13) 0%, transparent 58%),
+            radial-gradient(ellipse 700px 600px at 78% 88%, rgba(99,102,241,0.09) 0%, transparent 58%),
+            radial-gradient(ellipse 500px 400px at 55% 50%, rgba(139,92,246,0.04) 0%, transparent 70%),
+            #0D1117;
+          color: var(--text);
+          font-size: 15px;
+          line-height: 1.65;
+        }
+
+        a { color: var(--accent2); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ── Header ─────────────────────────────── */
+        .hdr {
+          position: fixed; top: 0; left: 0; right: 0;
+          height: var(--header-h);
+          background: var(--bg);
+          border-bottom: none;
+          display: flex; align-items: center;
+          padding: 0 20px; gap: 14px;
+          z-index: 200;
+        }
+
+        .hdr-logo {
+          display: flex; align-items: center; gap: 9px;
+          cursor: pointer; color: var(--text); text-decoration: none;
+        }
+
+        .hdr-logo-icon {
+          width: 30px; height: 30px;
+          border-radius: 7px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 16px; flex-shrink: 0;
+        }
+
+        .hdr-logo-name { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+        .hdr-logo-label {
+          font-size: 11px; color: var(--text3); font-weight: 400;
+          background: var(--bg3); border: 1px solid var(--border);
+          padding: 1px 6px; border-radius: 4px; margin-left: 2px;
+        }
+
+        .hdr-sep { width: 1px; height: 22px; background: var(--border); }
+
+        .hdr-sub { font-size: 13px; color: var(--text2); }
+
+        .hdr-badges { margin-left: auto; display: flex; gap: 6px; }
+
+        .hbadge {
+          display: inline-flex; align-items: center; gap: 4px;
+          padding: 3px 8px; border-radius: 12px;
+          font-size: 11px; font-weight: 500;
+          border: 1px solid var(--border); color: var(--text2);
+        }
+        .hbadge.kt  { border-color:#7F52FF; color:#A78BFA; background:rgba(127,82,255,.09); }
+        .hbadge.kmp { border-color:#4285F4; color:#60A5FA; background:rgba(66,133,244,.09); }
+        .hbadge.cmp { border-color:#3DDC84; color:#6EE7B7; background:rgba(61,220,132,.09); }
+
+        .mob-menu-btn {
+          display: none;
+          background: none; border: 1px solid var(--border);
+          color: var(--text2); border-radius: 6px;
+          padding: 5px 8px; cursor: pointer; font-size: 16px;
+          margin-left: auto;
+        }
+
+        /* ── Layout ──────────────────────────────── */
+        .layout {
+          display: flex;
+          margin-top: var(--header-h);
+          min-height: calc(100vh - var(--header-h));
+        }
+
+        /* ── Sidebar ─────────────────────────────── */
+        .sidebar {
+          position: fixed;
+          top: var(--header-h); left: 0;
+          width: var(--sidebar-w);
+          height: calc(100vh - var(--header-h));
+          background: var(--bg);
+          border-right: none;
+          overflow-y: auto;
+          padding: 20px 0 40px;
+          transition: transform .25s ease;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        .nav-group { margin-bottom: 4px; }
+
+        .nav-group-label {
+          font-size: 10.5px; font-weight: 600;
+          letter-spacing: .09em; text-transform: uppercase;
+          color: var(--text3);
+          padding: 14px 18px 5px;
+        }
+
+        .nav-link {
+          display: flex; align-items: center; gap: 11px;
+          padding: 11px 16px;
+          margin: 3px 10px;
+          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-size: 15px; color: var(--text2);
+          cursor: pointer; border: none; background: none;
+          width: calc(100% - 20px);
+          text-align: left;
+          border-radius: 10px;
+          transition: all .12s ease;
+          letter-spacing: .01em;
+        }
+
+        .nav-link:hover { color: var(--text); background: rgba(255,255,255,.05); border-radius: 10px; }
+
+        .nav-link.active {
+          color: var(--accent2);
+          background: var(--accent-dim);
+          border-radius: 10px;
+          font-weight: 600;
+        }
+
+        .nav-icon { font-size: 15px; flex-shrink: 0; }
+
+        /* ── Main content ────────────────────────── */
+        .content {
+          margin-left: var(--sidebar-w);
+          flex: 1;
+          padding: 48px 60px 80px;
+          min-width: 0;
+          max-width: calc(860px + var(--sidebar-w));
+        }
+
+        /* ── Sections ────────────────────────────── */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .sec-cat {
+          font-size: 11.5px; font-weight: 600;
+          letter-spacing: .08em; text-transform: uppercase;
+          color: var(--accent2); margin-bottom: 6px;
+        }
+
+        .sec-title {
+          font-size: 30px; font-weight: 700;
+          letter-spacing: -.5px; line-height: 1.18;
+          color: var(--text); margin-bottom: 10px;
+        }
+
+        .sec-lead {
+          font-size: 16px; color: var(--text2);
+          max-width: 640px; margin-bottom: 36px;
+          line-height: 1.7;
+        }
+
+        hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+        h2 {
+          font-size: 19px; font-weight: 600;
+          color: var(--text); margin: 36px 0 10px;
+        }
+
+        h3 {
+          font-size: 15px; font-weight: 600;
+          color: var(--text); margin: 22px 0 8px;
+        }
+
+        p { color: var(--text2); margin-bottom: 14px; line-height: 1.72; }
+
+        ul, ol { color: var(--text2); padding-left: 22px; margin-bottom: 14px; }
+        li { margin-bottom: 6px; line-height: 1.7; }
+
+        code {
+          font-family: 'SF Mono','Fira Code',Menlo,monospace;
+          font-size: 13px;
+          background: var(--bg3); color: #D2A8FF;
+          padding: 2px 6px; border-radius: 4px;
+          border: 1px solid var(--border);
+        }
+
+        /* ── Code blocks ─────────────────────────── */
+        .code-wrap {
+          border: 1px solid var(--border);
+          border-radius: 8px; overflow: hidden;
+          margin-bottom: 20px;
+        }
+
+        .code-hdr {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 9px 14px;
+          background: var(--bg3);
+          border-bottom: 1px solid var(--border);
+        }
+
+        .code-hdr-left { display: flex; align-items: center; gap: 8px; }
+
+        .code-filename {
+          font-size: 12px; font-weight: 500;
+          color: var(--text2);
+          font-family: 'SF Mono', Menlo, monospace;
+        }
+
+        .code-lang {
+          font-size: 10.5px; color: var(--text3);
+          background: var(--bg); border: 1px solid var(--border2);
+          padding: 1px 6px; border-radius: 3px;
+        }
+
+        .copy-btn {
+          background: none; border: 1px solid var(--border);
+          color: var(--text3); padding: 3px 9px;
+          border-radius: 4px; cursor: pointer;
+          font-size: 11px; transition: all .12s;
+        }
+
+        .copy-btn:hover { color: var(--text2); border-color: var(--text3); }
+        .copy-btn.copied { color: #34D399; border-color: #34D399; }
+
+        .code-wrap pre {
+          background: var(--bg2) !important;
+          margin: 0; padding: 0;
+          border-radius: 0;
+        }
+
+        .code-wrap pre code {
+          background: transparent !important;
+          color: inherit;
+          padding: 16px 18px !important;
+          border: none;
+          border-radius: 0;
+          display: block;
+          font-size: 13px;
+          line-height: 1.6;
+          overflow-x: auto;
+        }
+
+        /* ── Table ───────────────────────────────── */
+        .tbl-wrap {
+          border: 1px solid var(--border);
+          border-radius: 8px; overflow: hidden;
+          margin-bottom: 20px;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+        th {
+          text-align: left; padding: 10px 14px;
+          font-size: 11px; font-weight: 600;
+          color: var(--text3); text-transform: uppercase;
+          letter-spacing: .05em;
+          background: var(--bg3);
+          border-bottom: 1px solid var(--border);
+        }
+
+        td { padding: 10px 14px; color: var(--text2); border-bottom: 1px solid var(--border2); }
+        td:first-child { color: var(--text); font-family: 'SF Mono', Menlo, monospace; font-size: 13px; }
+        tr:last-child td { border-bottom: none; }
+
+        /* ── Callout ─────────────────────────────── */
+        .callout {
+          border-left: 3px solid;
+          padding: 13px 16px;
+          border-radius: 0 8px 8px 0;
+          margin-bottom: 20px;
+        }
+        .callout p { margin-bottom: 0; font-size: 14px; }
+        .callout-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+
+        .callout-info  { border-color:#3B82F6; background:rgba(59,130,246,.07); }
+        .callout-warn  { border-color:#F59E0B; background:rgba(245,158,11,.07); }
+        .callout-tip   { border-color:#10B981; background:rgba(16,185,129,.07); }
+
+        .callout-info  .callout-title { color:#60A5FA; }
+        .callout-warn  .callout-title { color:#FCD34D; }
+        .callout-tip   .callout-title { color:#34D399; }
+
+        /* ── Feature grid ────────────────────────── */
+        .feat-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px; margin-bottom: 28px;
+        }
+
+        .feat-card {
+          background: var(--bg2);
+          border: 1px solid var(--border);
+          border-radius: 8px; padding: 16px;
+        }
+
+        .feat-icon { font-size: 20px; margin-bottom: 8px; }
+        .feat-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .feat-desc  { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+        /* ── Steps ───────────────────────────────── */
+        .steps { list-style: none; padding: 0; }
+
+        .step {
+          display: flex; gap: 16px;
+          margin-bottom: 24px;
+        }
+
+        .step-num {
+          flex-shrink: 0; width: 28px; height: 28px;
+          background: var(--accent-dim);
+          border: 1px solid var(--accent);
+          color: var(--accent2);
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 13px; font-weight: 600;
+          margin-top: 2px;
+        }
+
+        .step-body h3 { margin-top: 0; margin-bottom: 6px; }
+        .step-body p  { margin-bottom: 0; }
+
+        /* ── Platform tabs ───────────────────────── */
+        .plat-tabs {
+          display: flex; gap: 0;
+          border-bottom: 1px solid var(--border);
+          margin-bottom: 0;
+        }
+
+        .plat-tab {
+          padding: 8px 16px;
+          font-size: 13px; font-weight: 500;
+          color: var(--text2); cursor: pointer;
+          border: none; background: none;
+          border-bottom: 2px solid transparent;
+          margin-bottom: -1px;
+          transition: all .12s;
+        }
+        .plat-tab:hover { color: var(--text); }
+        .plat-tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+        .tab-pane { display: none; margin-top: 16px; }
+        .tab-pane.active { display: block; }
+
+        /* ── Inline badges ───────────────────────── */
+        .ib {
+          display: inline-block;
+          padding: 1px 7px; border-radius: 10px;
+          font-size: 11px; font-weight: 600; letter-spacing: .02em;
+          vertical-align: middle;
+        }
+        .ib-and { background:rgba(61,220,132,.12); color:#3DDC84; border:1px solid rgba(61,220,132,.3); }
+        .ib-ios { background:rgba(167,139,250,.12); color:#A78BFA; border:1px solid rgba(167,139,250,.3); }
+
+        /* ── FAQ ─────────────────────────────────── */
+        .faq-item {
+          border: 1px solid var(--border);
+          border-radius: 8px; margin-bottom: 10px; overflow: hidden;
+        }
+
+        .faq-q {
+          width: 100%; background: var(--bg2);
+          border: none; padding: 15px 18px;
+          text-align: left; color: var(--text);
+          font-size: 14.5px; font-weight: 500;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: space-between; gap: 16px;
+          transition: background .12s;
+        }
+        .faq-q:hover { background: var(--bg3); }
+
+        .faq-arrow { flex-shrink: 0; color: var(--text3); transition: transform .2s; }
+        .faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+        .faq-a {
+          padding: 0 18px;
+          max-height: 0; overflow: hidden;
+          transition: max-height .25s ease, padding .25s ease;
+        }
+        .faq-item.open .faq-a { padding: 0 18px 16px; max-height: 500px; }
+        .faq-a p { margin-bottom: 0; font-size: 14px; }
+
+        /* ── Developer cards ─────────────────────── */
+        .dev-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+          margin-top: 28px;
+        }
+
+        .dev-card {
+          background: var(--bg2);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 28px 24px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 12px;
+          transition: border-color .15s, transform .15s;
+        }
+
+        .dev-card:hover {
+          border-color: var(--accent);
+          transform: translateY(-2px);
+        }
+
+        .dev-avatar {
+          width: 80px; height: 80px;
+          border-radius: 50%;
+          border: 2px solid var(--border);
+          object-fit: cover;
+        }
+
+        .dev-name {
+          font-size: 16px; font-weight: 700;
+          color: var(--text);
+        }
+
+        .dev-role {
+          font-size: 12px; font-weight: 500;
+          color: var(--accent2);
+          text-transform: uppercase;
+          letter-spacing: .07em;
+        }
+
+        .dev-link {
+          display: inline-flex; align-items: center; gap: 6px;
+          margin-top: 4px;
+          padding: 6px 14px;
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          font-size: 13px; color: var(--text2);
+          text-decoration: none;
+          transition: all .12s;
+        }
+
+        .dev-link:hover {
+          border-color: var(--accent2);
+          color: var(--accent2);
+          text-decoration: none;
+        }
+
+        /* ── About page ──────────────────────────── */
+        .license-block {
+          background: var(--bg2);
+          border: 1px solid var(--border);
+          border-radius: 8px; padding: 20px;
+          font-family: 'SF Mono', Menlo, monospace;
+          font-size: 12.5px; color: var(--text2);
+          line-height: 1.7; white-space: pre-wrap;
+        }
+
+        /* ── Mobile ──────────────────────────────── */
+        @media (max-width: 800px) {
+          .sidebar {
+            transform: translateX(-100%);
+            z-index: 150;
+          }
+          .sidebar.open { transform: translateX(0); }
+          .content { margin-left: 0; padding: 28px 20px 60px; }
+          .feat-grid { grid-template-columns: 1fr; }
+          .dev-grid  { grid-template-columns: 1fr; }
+          .hdr-badges { display: none; }
+          .mob-menu-btn { display: block; }
+          .mob-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.5); z-index: 140;
+          }
+          .mob-overlay.open { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="hdr">
+    <a class="hdr-logo" onclick="navigate('introduction')">
+        <div class="hdr-logo-icon" style="padding:0;overflow:hidden;">
+            <img src="ferret.png" alt="Ferret"
+                 style="width:100%;height:100%;object-fit:cover;border-radius:7px;"/>
+        </div>
+        <span class="hdr-logo-name">Ferret</span>
+        <span class="hdr-logo-label">SDK Docs</span>
+    </a>
+    <div class="hdr-sep"></div>
+    <span class="hdr-sub">v1.0.0</span>
+    <div class="hdr-badges">
+        <span class="hbadge kt">Kotlin KMP</span>
+        <span class="hbadge kmp">Android · iOS</span>
+        <span class="hbadge cmp">Ktor Plugin</span>
+    </div>
+    <button class="mob-menu-btn" onclick="toggleMobileMenu()">☰</button>
+</header>
+
+<div class="mob-overlay" id="mob-overlay" onclick="toggleMobileMenu()"></div>
+
+<!-- ═══════════════ LAYOUT ═══════════════ -->
+<div class="layout">
+
+    <!-- ─── SIDEBAR ─────────────────────────── -->
+    <nav class="sidebar" id="sidebar">
+
+        <div class="nav-group">
+            <div class="nav-group-label">Get Started</div>
+            <button class="nav-link active" data-target="introduction">
+                <span class="nav-icon">📖</span> Introduction
+            </button>
+            <button class="nav-link" data-target="features">
+                <span class="nav-icon">✨</span> Features
+            </button>
+            <button class="nav-link" data-target="requirements">
+                <span class="nav-icon">📋</span> Requirements
+            </button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-label">Integration</div>
+            <button class="nav-link" data-target="basic-integration">
+                <span class="nav-icon">⚡</span> Basic Integration
+            </button>
+            <button class="nav-link" data-target="android-setup">
+                <span class="nav-icon">🤖</span> Android Setup
+            </button>
+            <button class="nav-link" data-target="ios-setup">
+                <span class="nav-icon">🍎</span> iOS Setup
+            </button>
+            <button class="nav-link" data-target="opening-inspector">
+                <span class="nav-icon">🔍</span> Opening the Inspector
+            </button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-label">Customization</div>
+            <button class="nav-link" data-target="configuration">
+                <span class="nav-icon">⚙️</span> Ferret Configuration
+            </button>
+            <button class="nav-link" data-target="notification-settings">
+                <span class="nav-icon">🔔</span> Notification Settings
+            </button>
+            <button class="nav-link" data-target="notification-permission">
+                <span class="nav-icon">🛡️</span> Notification Permission
+            </button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-label">Using the Inspector</div>
+            <button class="nav-link" data-target="inspector-overview">
+                <span class="nav-icon">🖥️</span> Inspector Overview
+            </button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-label">Reference</div>
+            <button class="nav-link" data-target="faq">
+                <span class="nav-icon">❓</span> FAQ
+            </button>
+            <button class="nav-link" data-target="developers">
+                <span class="nav-icon">👥</span> Developers
+            </button>
+            <button class="nav-link" data-target="about">
+                <span class="nav-icon">ℹ️</span> About &amp; License
+            </button>
+        </div>
+
+    </nav>
+
+    <!-- ─── MAIN CONTENT ─────────────────────── -->
+    <main class="content" id="main-content">
+
+
+        <!-- ══════ INTRODUCTION ══════ -->
+        <section class="section active" id="introduction">
+            <div style="display:flex; align-items:center; gap:24px; margin-bottom:28px; flex-wrap:wrap;">
+                <div style="width:120px;height:120px;border-radius:16px;flex-shrink:0;overflow:hidden;">
+                    <img src="ferret.png" alt="Ferret mascot"
+                         style="width:100%;height:100%;object-fit:cover;"
+                         onerror="this.parentElement.style.display='none'"/>
+                </div>
+                <div>
+                    <div class="sec-cat">Get Started</div>
+                    <h1 class="sec-title" style="margin-bottom:8px;">Introduction</h1>
+                    <p class="sec-lead" style="margin-bottom:0;">Ferret is a Kotlin Multiplatform
+                        network inspector that plugs directly into your Ktor <code>HttpClient</code>.
+                        It captures every HTTP request, response, and WebSocket message — and
+                        surfaces it all in a slick on-device debug UI, with no proxy, no
+                        certificate, no separate build.</p>
+                </div>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">What does Ferret do?</div>
+                <p>Ferret acts as a transparent Ktor plugin. Every request and response flows
+                    through it, gets persisted to a local Room (SQLite) database, and is immediately
+                    visible via a rolling system notification and a full in-app inspector screen —
+                    all entirely on-device.</p>
+            </div>
+
+            <h2>How it works</h2>
+            <ul class="steps">
+                <li class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <h3>Install the plugin</h3>
+                        <p>Call <code>install(Ferret) { ... }</code> when you create your <code>HttpClient</code>.
+                            That's all the code you write.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-body">
+                        <h3>Traffic is captured automatically</h3>
+                        <p>Every HTTP request, response, and WebSocket frame that flows through your
+                            client is intercepted and stored locally. No proxy, no certificate trust
+                            profile, no separate debug build variant required.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-body">
+                        <h3>Inspect from anywhere</h3>
+                        <p>A rolling system notification summarizes recent activity — tap it to jump
+                            straight into the inspector. On Android a home-screen shortcut gives
+                            one-tap access even when the notification is dismissed.</p>
+                    </div>
+                </li>
+            </ul>
+
+            <h2>Supported platforms</h2>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Ktor Engine</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Android</td>
+                        <td>OkHttp</td>
+                        <td>✅ Fully supported</td>
+                    </tr>
+                    <tr>
+                        <td>iOS</td>
+                        <td>Darwin</td>
+                        <td>✅ Fully supported</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Distributed via Maven Central</h2>
+            <p>Ferret is published to Maven Central under the group
+                <code>io.github.ferret-org</code>. See <a href="#"
+                                                          onclick="navigate('basic-integration'); return false;">Basic
+                    Integration</a> for the dependency snippet.</p>
+        </section>
+
+
+        <!-- ══════ FEATURES ══════ -->
+        <section class="section" id="features">
+            <div class="sec-cat">Get Started</div>
+            <h1 class="sec-title">Features</h1>
+            <p class="sec-lead">Everything you need to inspect your app's network traffic — without
+                leaving the device.</p>
+
+            <div class="feat-grid">
+                <div class="feat-card">
+                    <div class="feat-icon">📡</div>
+                    <div class="feat-title">HTTP &amp; WebSocket</div>
+                    <div class="feat-desc">Captures regular HTTP requests/responses and WebSocket
+                        connections with all their frames — sent and received.
+                    </div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">📱</div>
+                    <div class="feat-title">Kotlin Multiplatform</div>
+                    <div class="feat-desc">One dependency, one integration step. Identical behavior
+                        on Android and iOS — no platform-specific code to write.
+                    </div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔔</div>
+                    <div class="feat-title">Rolling Notification</div>
+                    <div class="feat-desc">A persistent notification summarizes the most recent
+                        requests. Tap it at any time to open the full inspector.
+                    </div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">⚡</div>
+                    <div class="feat-title">App Shortcut</div>
+                    <div class="feat-desc">Android launcher shortcut for one-tap access to the
+                        inspector from the home screen — no notification needed.
+                    </div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔍</div>
+                    <div class="feat-title">Search &amp; Filter</div>
+                    <div class="feat-desc">Filter the record list by URL, HTTP method, status code,
+                        or by traffic type (HTTP / WebSocket / All).
+                    </div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">📤</div>
+                    <div class="feat-title">Share as cURL</div>
+                    <div class="feat-desc">Export any request as a ready-to-run <code>curl</code>
+                        command or as plain text for a bug report — one tap.
+                    </div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">📋</div>
+                    <div class="feat-title">Copy to Clipboard</div>
+                    <div class="feat-desc">Tap any field — URL, header, body, status — to copy it to
+                        the clipboard directly from the detail screen.
+                    </div>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">🔒</div>
+                    <div class="feat-title">Fully On-Device</div>
+                    <div class="feat-desc">All captured data lives in a local Room database. Nothing
+                        is ever sent to an external server or logged outside the app.
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout callout-tip">
+                <div class="callout-title">No proxy needed</div>
+                <p>Unlike Charles Proxy or Proxyman, Ferret requires no SSL certificate trust
+                    profile, no Wi-Fi proxy configuration, and no desktop companion. It works inside
+                    the app process, on the device, in any environment.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ REQUIREMENTS ══════ -->
+        <section class="section" id="requirements">
+            <div class="sec-cat">Get Started</div>
+            <h1 class="sec-title">Requirements</h1>
+            <p class="sec-lead">Ferret requires Ktor as your HTTP client. Here are the full version
+                requirements before adding the dependency.</p>
+
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Tool / Dependency</th>
+                        <th>Minimum</th>
+                        <th>Built &amp; tested with</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Kotlin</td>
+                        <td>1.9.0</td>
+                        <td>2.4.0</td>
+                    </tr>
+                    <tr>
+                        <td>Ktor</td>
+                        <td>3.x</td>
+                        <td>3.5.1</td>
+                    </tr>
+                    <tr>
+                        <td>Compose Multiplatform</td>
+                        <td>1.10.x</td>
+                        <td>1.10.3</td>
+                    </tr>
+                    <tr>
+                        <td>Android Gradle Plugin</td>
+                        <td>—</td>
+                        <td>9.2.1</td>
+                    </tr>
+                    <tr>
+                        <td>Gradle</td>
+                        <td>—</td>
+                        <td>9.4.1</td>
+                    </tr>
+                    <tr>
+                        <td>Android <code>minSdk</code></td>
+                        <td><strong>28</strong></td>
+                        <td>28</td>
+                    </tr>
+                    <tr>
+                        <td>Android <code>compileSdk</code> / <code>targetSdk</code></td>
+                        <td>37</td>
+                        <td>37</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-warn">
+                <div class="callout-title">minSdk 28 is a hard floor</div>
+                <p>Ferret declares <code>minSdk 28</code> in its own manifest. Any app that adds
+                    Ferret as a dependency inherits this constraint. Check your app's
+                    <code>minSdk</code> before integrating.</p>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">Ktor is required</div>
+                <p>Ferret is implemented as a Ktor <code>HttpClientPlugin</code>. It is not a system
+                    proxy or a network VPN — your app must route HTTP traffic through a Ktor <code>HttpClient</code>
+                    for Ferret to intercept it.</p>
+            </div>
+
+            <h2>iOS targets</h2>
+            <p>Ferret publishes pre-built artifacts for all three standard iOS targets:</p>
+            <ul>
+                <li><code>iosArm64</code> — physical iPhone / iPad devices</li>
+                <li><code>iosSimulatorArm64</code> — Apple Silicon simulators</li>
+                <li><code>iosX64</code> — Intel Mac simulators</li>
+            </ul>
+        </section>
+
+
+        <!-- ══════ BASIC INTEGRATION ══════ -->
+        <section class="section" id="basic-integration">
+            <div class="sec-cat">Integration</div>
+            <h1 class="sec-title">Basic Integration</h1>
+            <p class="sec-lead">Add the dependency from Maven Central and install the Ktor plugin —
+                that's all it takes.</p>
+
+            <h2>Step 1 — Version catalog</h2>
+            <p>Declare the version and library alias in <code>gradle/libs.versions.toml</code>:</p>
+
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">libs.versions.toml</span>
+                        <span class="code-lang">TOML</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-toml">[versions]
+ferret = "1.0.0"
+
+[libraries]
+ferret = { module = "io.github.ferret-org:ferret", version.ref = "ferret" }</code></pre>
+            </div>
+
+            <h2>Step 2 — Add the dependency</h2>
+            <p>In your shared/common module's <code>build.gradle.kts</code>:</p>
+
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">build.gradle.kts</span>
+                        <span class="code-lang">Kotlin DSL</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.ferret)
+        }
+    }
+}</code></pre>
+            </div>
+
+            <div class="callout callout-tip">
+                <div class="callout-title">Next step</div>
+                <p>After adding the dependency, follow the platform-specific setup to install the
+                    plugin: <a href="#" onclick="navigate('android-setup');return false;">Android
+                        Setup</a> or <a href="#" onclick="navigate('ios-setup');return false;">iOS
+                        Setup</a>.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ ANDROID SETUP ══════ -->
+        <section class="section" id="android-setup">
+            <div class="sec-cat">Integration</div>
+            <h1 class="sec-title">Android Setup</h1>
+            <p class="sec-lead">Full setup guide for Android: manifest permissions, client
+                configuration, and what Ferret configures automatically on first run.</p>
+
+            <h2>1 · Add manifest permissions</h2>
+            <p>Add both permissions to your app's <code>AndroidManifest.xml</code>:</p>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">AndroidManifest.xml</span>
+                        <span class="code-lang">XML</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-xml">&lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+&lt;uses-permission android:name="android.permission.POST_NOTIFICATIONS" /&gt;</code></pre>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">POST_NOTIFICATIONS</div>
+                <p>This permission is needed to display the rolling capture notification. Ferret
+                    still captures all traffic without it — the notification just won't appear. See
+                    <a href="#" onclick="navigate('notification-permission');return false;">Notification
+                        Permission</a> for how to request it at runtime on Android 13+.</p>
+            </div>
+
+            <h2>2 · Install the plugin</h2>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">NetworkModule.kt</span>
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">import com.ferret.intercept.Ferret
+import com.ferret.intercept.install
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+
+val client = HttpClient(OkHttp) {
+    install(Ferret) {
+        context = applicationContext
+    }
+}</code></pre>
+            </div>
+
+            <p>Pass an Android <code>Context</code> to the <code>context</code> property. Using
+                <code>applicationContext</code> is recommended — it survives configuration changes
+                and Activity recreation.</p>
+
+            <h2>3 · What Ferret configures automatically</h2>
+            <p>The first time the plugin initializes it performs four setup steps automatically:</p>
+            <ol>
+                <li>Creates its <strong>Room database</strong> on-device to persist captured network
+                    records.
+                </li>
+                <li>Creates a <strong>notification channel</strong> (<code>"General"</code> by
+                    default) on Android 8+.
+                </li>
+                <li>Registers a <strong>dynamic launcher shortcut</strong> labeled "Open Ferret
+                    Inspector".
+                </li>
+                <li>Starts <strong>posting the rolling notification</strong> as traffic flows
+                    through the client.
+                </li>
+            </ol>
+
+            <h2>Activity auto-merge</h2>
+            <p>Ferret's inspector activity (<code>com.ferret.ui.FerretActivity</code>) is declared
+                in the library's own manifest and merges into your app automatically at build time.
+                No manual declaration in your manifest is needed.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">Early access</div>
+                <p>If the inspector is opened before the plugin has been installed (e.g. via the
+                    shortcut before the app runs), Ferret shows a dialog explaining it isn't ready
+                    yet — it does not crash.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ IOS SETUP ══════ -->
+        <section class="section" id="ios-setup">
+            <div class="sec-cat">Integration</div>
+            <h1 class="sec-title">iOS Setup</h1>
+            <p class="sec-lead">Ferret works on iOS with minimal setup. No context property, no
+                manifest changes — install the plugin and decide how to present the inspector.</p>
+
+            <h2>Install the plugin</h2>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">NetworkModule.kt</span>
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">import com.ferret.intercept.Ferret
+import com.ferret.intercept.install
+import io.ktor.client.*
+import io.ktor.client.engine.darwin.*
+
+val client = HttpClient(Darwin) {
+    install(Ferret) {}
+}</code></pre>
+            </div>
+
+            <p>There is no <code>context</code> field on iOS. Ferret initializes automatically the
+                first time the plugin is installed.</p>
+
+            <h2>Presenting the inspector</h2>
+            <p>iOS has no equivalent of Android's home-screen app shortcuts, so you decide where and
+                how to surface the inspector. Common approaches:</p>
+            <ul>
+                <li>A <strong>debug section</strong> in your app's settings screen</li>
+                <li>A <strong>shake gesture</strong> (override <code>motionEnded</code> in your root
+                    view controller)
+                </li>
+                <li>A <strong>hidden tap sequence</strong> on a logo or version label</li>
+                <li>A <strong>long-press</strong> on a designated debug element</li>
+            </ul>
+
+            <p>To open the inspector, call <code>FerretIosUi.open()</code> from Kotlin or present
+                <code>ferretViewController()</code> from Swift:</p>
+
+            <div class="plat-tabs">
+                <button class="plat-tab active" onclick="switchTab('ios','kotlin',this)">Kotlin
+                </button>
+                <button class="plat-tab" onclick="switchTab('ios','swift',this)">Swift</button>
+            </div>
+            <div id="ios-kotlin" class="tab-pane active">
+                <div class="code-wrap">
+                    <div class="code-hdr">
+                        <div class="code-hdr-left">
+                            <span class="code-filename">DebugHelper.kt</span>
+                            <span class="code-lang">Kotlin</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code class="language-kotlin">FerretIosUi.open()</code></pre>
+                </div>
+            </div>
+            <div id="ios-swift" class="tab-pane">
+                <div class="code-wrap">
+                    <div class="code-hdr">
+                        <div class="code-hdr-left">
+                            <span class="code-filename">DebugViewController.swift</span>
+                            <span class="code-lang">Swift</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code class="language-swift">let vc = YourSharedFramework.ferretViewController()
+present(vc, animated: true)</code></pre>
+                </div>
+            </div>
+
+            <h2>Notifications on iOS</h2>
+            <p>Ferret uses <code>UNUserNotificationCenter</code> on iOS. To have Ferret request
+                notification permission at startup, set <code>requestPermission = true</code>:</p>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">install(Ferret) {
+    configuration = FerretConfiguration(
+        notifications = NotificationConfiguration(
+            requestPermission = true
+        )
+    )
+}</code></pre>
+            </div>
+        </section>
+
+
+        <!-- ══════ OPENING THE INSPECTOR ══════ -->
+        <section class="section" id="opening-inspector">
+            <div class="sec-cat">Integration</div>
+            <h1 class="sec-title">Opening the Inspector</h1>
+            <p class="sec-lead">Several ways to open the Ferret inspector UI, depending on your
+                platform and workflow.</p>
+
+            <h2>Android <span class="ib ib-and">Android</span></h2>
+
+            <h3>Notification tap</h3>
+            <p>While Ferret is capturing traffic it posts a rolling system notification. Tapping it
+                opens <code>FerretActivity</code> directly — no setup required beyond installing the
+                plugin.</p>
+
+            <h3>Home-screen shortcut</h3>
+            <p>Ferret registers a dynamic launcher shortcut labeled <strong>"Open Ferret
+                Inspector"</strong>. Long-press your app's icon and select it to jump into the
+                inspector at any time, even if the notification is dismissed.</p>
+
+            <h3>Programmatic launch</h3>
+            <p>Launch from a debug settings screen, a hidden gesture, or any other trigger:</p>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">DebugActivity.kt</span>
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">startActivity(
+    Intent(context, Class.forName("com.ferret.ui.FerretActivity"))
+)</code></pre>
+            </div>
+
+            <hr/>
+
+            <h2>iOS <span class="ib ib-ios">iOS</span></h2>
+
+            <h3>Notification tap</h3>
+            <p>When Ferret is active and has notification permission, it posts a rolling
+                notification via <code>UNUserNotificationCenter</code>. Tapping it opens the
+                inspector directly — no extra code needed. Make sure <code>requestPermission =
+                    true</code> is set in <code>NotificationConfiguration</code>, or request the
+                permission yourself before Ferret can show the notification.</p>
+
+            <h3>From Kotlin / shared code</h3>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">DebugHelper.kt</span>
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">FerretIosUi.open()</code></pre>
+            </div>
+
+            <h3>From Swift</h3>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">DebugViewController.swift</span>
+                        <span class="code-lang">Swift</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-swift">// Replace "YourSharedFramework" with your actual Kotlin/Native framework name
+let controller = YourSharedFramework.ferretViewController()
+present(controller, animated: true)</code></pre>
+            </div>
+
+            <div class="callout callout-tip">
+                <div class="callout-title">iOS trigger ideas</div>
+                <p>No system shortcut on iOS means you pick the trigger. Common patterns: shake the
+                    device, tap a version label five times, or add a "Debug" row in a settings
+                    screen that's only compiled in debug builds.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ CONFIGURATION ══════ -->
+        <section class="section" id="configuration">
+            <div class="sec-cat">Customization</div>
+            <h1 class="sec-title">Ferret Configuration</h1>
+            <p class="sec-lead">All of Ferret's behavior is controlled through a single <code>FerretConfiguration</code>
+                data class. Pass it to <code>install(Ferret) { configuration = ... }</code>. If
+                omitted, defaults are used.</p>
+
+            <h2>Full example</h2>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-filename">NetworkModule.kt</span>
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">install(Ferret) {
+    context = applicationContext          // Android only
+    configuration = FerretConfiguration(
+        notifications = NotificationConfiguration(
+            maxBufferSize       = 5,
+            defaultPriority     = NotificationPriority.HIGH,
+            defaultChannel      = NotificationChannelSpec(
+                id   = "ferret_debug",
+                name = "Ferret Debug"
+            ),
+            defaultSmallIcon    = R.drawable.ic_notification, // Android only
+            requestPermission   = false
+        ),
+        retentionDurationHours = 24L
+    )
+}</code></pre>
+            </div>
+
+            <h2>FerretConfiguration properties</h2>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Type</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>notifications</td>
+                        <td><code>NotificationConfiguration</code></td>
+                        <td><code>NotificationConfiguration()</code></td>
+                        <td>Controls the rolling notification. See <a href="#"
+                                                                      onclick="navigate('notification-settings');return false;">Notification
+                            Settings</a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>retentionDurationHours</td>
+                        <td><code>Long</code></td>
+                        <td><code>12</code></td>
+                        <td>Records older than this many hours are automatically deleted on
+                            initialization.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Retention</h2>
+            <p>Ferret automatically purges records older than <code>retentionDurationHours</code>
+                each time the plugin initializes. The default (12 hours) is enough for a typical
+                development session while bounding on-device storage use. Increase it if you need to
+                retain history across multiple app launches.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">Manual clear</div>
+                <p>You can always wipe all records immediately using the trash icon in the inspector
+                    UI, regardless of the retention setting.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ NOTIFICATION SETTINGS ══════ -->
+        <section class="section" id="notification-settings">
+            <div class="sec-cat">Customization</div>
+            <h1 class="sec-title">Notification Settings</h1>
+            <p class="sec-lead">Control how the rolling capture notification looks and behaves using
+                <code>NotificationConfiguration</code>.</p>
+
+            <h2>NotificationConfiguration properties</h2>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>maxBufferSize</td>
+                        <td><code>5</code></td>
+                        <td>Number of recent request entries shown in the notification body.</td>
+                    </tr>
+                    <tr>
+                        <td>defaultPriority</td>
+                        <td><code>HIGH</code></td>
+                        <td>Notification priority — controls heads-up behavior and ranking. See <a
+                                href="#notif-priority">NotificationPriority</a> below.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>defaultChannel</td>
+                        <td><code>NotificationChannelSpec()</code></td>
+                        <td>The Android notification channel Ferret posts to. Customise the
+                            <code>id</code> and display <code>name</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>defaultSmallIcon</td>
+                        <td>System default</td>
+                        <td>Drawable resource ID for the notification small icon. <span
+                                class="ib ib-and">Android</span> only.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>requestPermission</td>
+                        <td><code>false</code></td>
+                        <td>When <code>true</code>, Ferret requests notification permission from the
+                            OS at initialization. <span class="ib ib-ios">iOS</span> only — no-op on
+                            Android.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 id="notif-priority">NotificationPriority</h2>
+            <p>Maps to <code>NotificationCompat</code> priority constants on Android and <code>UNNotificationInterruptionLevel</code>
+                on iOS.</p>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Value</th>
+                        <th>Android behavior</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>MIN</td>
+                        <td>No heads-up; minimal ranking. Does not make a sound.</td>
+                    </tr>
+                    <tr>
+                        <td>LOW</td>
+                        <td>No heads-up; lower-than-normal ranking.</td>
+                    </tr>
+                    <tr>
+                        <td>DEFAULT</td>
+                        <td>Standard notification ranking. May make a sound.</td>
+                    </tr>
+                    <tr>
+                        <td>HIGH</td>
+                        <td>May show as a heads-up notification. <em>(default)</em></td>
+                    </tr>
+                    <tr>
+                        <td>MAX</td>
+                        <td>Full urgency — use only when you really need immediate attention.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>NotificationChannelSpec</h2>
+            <p>Defines the Android notification channel. Channels are created once — changing
+                properties after the channel exists requires the user to clear app data or
+                reinstall.</p>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">NotificationChannelSpec(
+    id   = "ferret_debug",  // unique channel ID — used internally
+    name = "Ferret Debug"   // display name shown in system notification settings
+)</code></pre>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">Channel ID stability</div>
+                <p>Once your app has been installed, changing the channel <code>id</code> creates a
+                    new channel. The old channel — with the old settings the user may have
+                    customized — persists until you explicitly delete it or the user reinstalls.
+                    Keep the <code>id</code> stable across releases.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ NOTIFICATION PERMISSION ══════ -->
+        <section class="section" id="notification-permission">
+            <div class="sec-cat">Customization</div>
+            <h1 class="sec-title">Notification Permission</h1>
+            <p class="sec-lead">Starting with Android 13 (API 33), apps must request <code>POST_NOTIFICATIONS</code>
+                at runtime before they can display any notification.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">Capture always works</div>
+                <p>Ferret captures and stores all network traffic regardless of notification
+                    permission status. The rolling notification simply won't appear until the
+                    permission is granted. The in-app inspector and home-screen shortcut are always
+                    available.</p>
+            </div>
+
+            <h2>Ferret's responsibility</h2>
+            <p>Ferret declares <code>POST_NOTIFICATIONS</code> in its own manifest so it merges into
+                your app, but it does <strong>not</strong> request the permission at runtime. Your
+                app is responsible for requesting it — the same way you would for any of your own
+                notifications.</p>
+
+            <h2>Requesting at runtime</h2>
+            <p>If your app already requests notification permission for another feature, no extra
+                work is needed. If not, add a runtime request somewhere sensible — first launch, an
+                onboarding screen, or a debug settings screen.</p>
+
+            <h3>Compose API</h3>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-lang">Kotlin · Jetpack Compose</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">val permissionLauncher = rememberLauncherForActivityResult(
+    ActivityResultContracts.RequestPermission()
+) { granted ->
+    // handle the result
+}
+
+LaunchedEffect(Unit) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+}</code></pre>
+            </div>
+
+            <h3>Traditional API</h3>
+            <div class="code-wrap">
+                <div class="code-hdr">
+                    <div class="code-hdr-left">
+                        <span class="code-lang">Kotlin</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code class="language-kotlin">if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    ActivityCompat.requestPermissions(
+        this,
+        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+        REQUEST_CODE_NOTIFICATIONS
+    )
+}</code></pre>
+            </div>
+
+            <div class="callout callout-tip">
+                <div class="callout-title">iOS — set requestPermission = true</div>
+                <p>On iOS, set <code>requestPermission = true</code> in <code>NotificationConfiguration</code>.
+                    Ferret will call <code>UNUserNotificationCenter.requestAuthorization</code> at
+                    initialization time — no extra code from you.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ INSPECTOR OVERVIEW ══════ -->
+        <section class="section" id="inspector-overview">
+            <div class="sec-cat">Using the Inspector</div>
+            <h1 class="sec-title">Inspector Overview</h1>
+            <p class="sec-lead">The Ferret inspector is a full Compose Multiplatform UI shared
+                between Android and iOS. Here's a tour of what it offers.</p>
+
+            <h2>Network record list</h2>
+            <p>The main screen shows every captured HTTP call and WebSocket event, newest first.
+                Each row shows:</p>
+            <ul>
+                <li>HTTP method badge (<code>GET</code>, <code>POST</code>, …) or a WebSocket
+                    indicator
+                </li>
+                <li>Request URL / path</li>
+                <li>Response status code, color-coded by range (2xx green, 4xx orange, 5xx red)</li>
+                <li>Total request duration in milliseconds</li>
+            </ul>
+
+            <h2>Type tabs</h2>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Tab</th>
+                        <th>Shows</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>All</td>
+                        <td>Every captured record — HTTP and WebSocket combined</td>
+                    </tr>
+                    <tr>
+                        <td>HTTP</td>
+                        <td>Plain HTTP request/response pairs only</td>
+                    </tr>
+                    <tr>
+                        <td>WebSocket</td>
+                        <td>WebSocket connections and message frames only</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Search</h2>
+            <p>The search bar filters the active list by URL or path substring. Combine the tab
+                filter with search to zero in on a specific request fast.</p>
+
+            <h2>Detail screen — HTTP</h2>
+            <p>Tap any HTTP record to open the detail view. Four tabs are available:</p>
+            <ul>
+                <li><strong>Overview</strong> — method, full URL, status code, timing in ms,
+                    protocol, TLS info
+                </li>
+                <li><strong>Request</strong> — all request headers and the request body</li>
+                <li><strong>Response</strong> — all response headers and the response body</li>
+                <li><strong>Timing</strong> — per-phase breakdown (DNS, connect, TLS, TTFB,
+                    transfer)
+                </li>
+            </ul>
+
+            <h2>Detail screen — WebSocket</h2>
+            <ul>
+                <li><strong>Overview</strong> — URL, connection state, total duration</li>
+                <li><strong>Messages</strong> — all sent and received frames with timestamps, frame
+                    type, and byte size
+                </li>
+            </ul>
+
+            <h2>Share</h2>
+            <p>From the detail screen tap <strong>Share</strong> to export a request in two formats:
+            </p>
+            <ul>
+                <li><strong>cURL command</strong> — a ready-to-run shell command you can paste into
+                    a terminal or a colleague's chat
+                </li>
+                <li><strong>Plain text</strong> — a human-readable summary suitable for filing a bug
+                    report
+                </li>
+            </ul>
+
+            <h2>Copy to clipboard</h2>
+            <p>Tap any individual field — URL, header name/value, body, status code — to copy it
+                directly to the clipboard.</p>
+
+            <h2>Clear history</h2>
+            <p>The trash icon in the inspector toolbar wipes all captured records from the local
+                database immediately. The inspector will accumulate new records as fresh requests
+                are made.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">Everything stays on-device</div>
+                <p>All captured data is stored only in the on-device Room database. Nothing is ever
+                    transmitted to an external server, logged to a remote service, or shared outside
+                    the app process.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ FAQ ══════ -->
+        <section class="section" id="faq">
+            <div class="sec-cat">Reference</div>
+            <h1 class="sec-title">FAQ</h1>
+            <p class="sec-lead">Common questions about Ferret.</p>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Does Ferret support WebSockets?
+                    <svg class="faq-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="faq-a">
+                    <p>Yes. Ferret captures WebSocket connections and all message frames — both sent
+                        and received — in addition to regular HTTP traffic. Everything appears in
+                        the same inspector list. Use the <strong>WebSocket</strong> tab to filter to
+                        WebSocket-only events.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    How do I open the Ferret inspector?
+                    <svg class="faq-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="faq-a">
+                    <p>On <strong>Android</strong> there are two built-in options requiring no code:
+                        tap the rolling notification, or long-press your app icon and select "Open
+                        Ferret Inspector". You can also launch it programmatically with <code>startActivity(Intent(context,
+                            Class.forName("com.ferret.ui.FerretActivity")))</code>. On
+                        <strong>iOS</strong> there is no system shortcut — present <code>ferretViewController()</code>
+                        from wherever makes sense in your app (a debug menu, shake gesture, etc.).
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Does Ferret work without Ktor?
+                    <svg class="faq-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="faq-a">
+                    <p>No. Ferret is implemented as a Ktor <code>HttpClientPlugin</code>. It is not
+                        a system proxy or VPN — it cannot intercept traffic from OkHttp, Retrofit,
+                        URLSession, or any client that doesn't go through a Ktor
+                        <code>HttpClient</code>. Your networking layer must use Ktor for Ferret to
+                        capture it.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Does Ferret affect release build performance?
+                    <svg class="faq-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="faq-a">
+                    <p>Ferret is designed for development and internal builds. Gate the <code>install(Ferret)</code>
+                        call behind a debug flag (e.g. <code>if (BuildConfig.DEBUG)</code>) or swap
+                        in a plain <code>HttpClient</code> for release. If Ferret is not installed,
+                        it adds zero overhead — no plugin, no interception, no database.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Is captured data sent anywhere?
+                    <svg class="faq-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="faq-a">
+                    <p>No. Everything is stored in an on-device Room (SQLite) database. Ferret never
+                        makes outbound connections for telemetry or syncing and never sends captured
+                        data to any server. You can wipe all records at any time from the inspector
+                        UI.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Can I access captured records from my own code?
+                    <svg class="faq-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="faq-a">
+                    <p>Yes. After the plugin is initialized,
+                        <code>FerretSdk.networkRecordRepository</code> provides the full <code>NetworkRecordRepository</code>
+                        interface — including <code>observeAll(): Flow&lt;List&lt;NetworkRecord&gt;&gt;</code>,
+                        <code>getById(id)</code>, and <code>clear()</code>. This is useful for
+                        writing custom test assertions or building additional debug tooling on top
+                        of Ferret.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    What Ktor version does Ferret require?
+                    <svg class="faq-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="faq-a">
+                    <p>Ferret is built and tested with Ktor <strong>3.5.1</strong> and requires Ktor
+                        3.x. Ktor 2.x is not supported because the plugin API changed between major
+                        versions. Check the full <a href="#"
+                                                    onclick="navigate('requirements');return false;">Requirements</a>
+                        table for all version details.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ══════ DEVELOPERS ══════ -->
+        <section class="section" id="developers">
+            <div class="sec-cat">Reference</div>
+            <h1 class="sec-title">Developers</h1>
+            <p class="sec-lead">Ferret is built and maintained by the following developers.
+                Contributions, issues, and feedback are welcome on GitHub.</p>
+
+            <div class="dev-grid">
+
+                <div class="dev-card">
+                    <img
+                            class="dev-avatar"
+                            src="https://github.com/Aditya-gupta99.png"
+                            alt="Aditya Gupta"
+                            onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect width=%2280%22 height=%2280%22 rx=%2240%22 fill=%22%238B5CF6%22/><text x=%2240%22 y=%2252%22 text-anchor=%22middle%22 font-size=%2232%22 fill=%22white%22>A</text></svg>'"
+                    />
+                    <div class="dev-name">Aditya Gupta</div>
+                    <div class="dev-role">Core Developer</div>
+                    <a class="dev-link" href="https://github.com/Aditya-gupta99" target="_blank"
+                       rel="noopener">
+                        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        @Aditya-gupta99
+                    </a>
+                </div>
+
+                <div class="dev-card">
+                    <img
+                            class="dev-avatar"
+                            src="https://github.com/Nagarjuna0033.png"
+                            alt="Nagarjuna"
+                            onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect width=%2280%22 height=%2280%22 rx=%2240%22 fill=%22%238B5CF6%22/><text x=%2240%22 y=%2252%22 text-anchor=%22middle%22 font-size=%2232%22 fill=%22white%22>N</text></svg>'"
+                    />
+                    <div class="dev-name">Nagarjuna</div>
+                    <div class="dev-role">Core Developer</div>
+                    <a class="dev-link" href="https://github.com/Nagarjuna0033" target="_blank"
+                       rel="noopener">
+                        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        @Nagarjuna0033
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="callout callout-info" style="margin-top: 32px;">
+                <div class="callout-title">Contributing</div>
+                <p>Found a bug or want to improve Ferret? Open an issue or pull request on <a
+                        href="https://github.com/Ferret-org/Ferret" target="_blank" rel="noopener">GitHub</a>.
+                    All contributions are welcome.</p>
+            </div>
+        </section>
+
+
+        <!-- ══════ ABOUT ══════ -->
+        <section class="section" id="about">
+            <div class="sec-cat">Reference</div>
+            <h1 class="sec-title">About &amp; License</h1>
+            <p class="sec-lead">Ferret is an open-source Kotlin Multiplatform library licensed under
+                the Apache License 2.0.</p>
+
+            <h2>Why Ferret?</h2>
+            <p>Inspecting mobile network traffic has traditionally required external tools: Charles
+                Proxy, Proxyman, or Wireshark — each needing SSL certificate trust profiles, Wi-Fi
+                proxy configuration, and a desktop machine on the same network. Ferret eliminates
+                that friction by living inside the app process with a self-contained on-device UI.
+                Same visibility, no external dependencies.</p>
+
+            <h2>Technology stack</h2>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Version</th>
+                        <th>Purpose</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Kotlin Multiplatform</td>
+                        <td>2.4.0</td>
+                        <td>Shared business logic across Android and iOS</td>
+                    </tr>
+                    <tr>
+                        <td>Compose Multiplatform</td>
+                        <td>1.10.3</td>
+                        <td>Shared inspector UI — one codebase, both platforms</td>
+                    </tr>
+                    <tr>
+                        <td>Ktor</td>
+                        <td>3.5.1</td>
+                        <td>HTTP client plugin integration point</td>
+                    </tr>
+                    <tr>
+                        <td>Room</td>
+                        <td>2.7.1</td>
+                        <td>Local SQLite persistence for captured records</td>
+                    </tr>
+                    <tr>
+                        <td>kotlinx.coroutines</td>
+                        <td>—</td>
+                        <td>Async operations and Flow-based data streams</td>
+                    </tr>
+                    <tr>
+                        <td>kotlinx.datetime</td>
+                        <td>0.7.1</td>
+                        <td>Cross-platform date/time formatting</td>
+                    </tr>
+                    <tr>
+                        <td>kotlinx.serialization</td>
+                        <td>1.8.0</td>
+                        <td>JSON body parsing</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Maven coordinates</h2>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>groupId</td>
+                        <td>io.github.ferret-org</td>
+                    </tr>
+                    <tr>
+                        <td>artifactId</td>
+                        <td>ferret</td>
+                    </tr>
+                    <tr>
+                        <td>latest version</td>
+                        <td>1.0.0</td>
+                    </tr>
+                    <tr>
+                        <td>repository</td>
+                        <td>Maven Central</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>License</h2>
+            <p>Ferret is licensed under the <strong>Apache License 2.0</strong>.</p>
+
+            <div class="license-block">Copyright 2026 The Ferret Authors
+
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                http://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+    // ── Syntax highlighting ──────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+    });
+
+    // Prevent browser from auto-scrolling to hash element on load/navigation
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+    // ── Navigation ───────────────────────────
+    function scrollInstantToTop() {
+      document.documentElement.style.scrollBehavior = 'auto';
+      document.body.style.scrollBehavior = 'auto';
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+
+    function navigate(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+      const sec = document.getElementById(id);
+      if (sec) sec.classList.add('active');
+
+      const link = document.querySelector(`.nav-link[data-target="${id}"]`);
+      if (link) link.classList.add('active');
+
+      // Disable smooth scroll, force top immediately, re-enable after two frames
+      scrollInstantToTop();
+      requestAnimationFrame(() => {
+        scrollInstantToTop();
+        requestAnimationFrame(() => {
+          scrollInstantToTop();
+          document.documentElement.style.scrollBehavior = '';
+          document.body.style.scrollBehavior = '';
+        });
+      });
+
+      // close mobile sidebar
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('mob-overlay').classList.remove('open');
+
+      // update URL without triggering a scroll
+      history.replaceState(null, '', '#' + id);
+    }
+
+    // Catch any late scroll caused by fonts/images finishing after navigate()
+    window.addEventListener('load', () => {
+      scrollInstantToTop();
+      requestAnimationFrame(() => {
+        scrollInstantToTop();
+        document.documentElement.style.scrollBehavior = '';
+        document.body.style.scrollBehavior = '';
+      });
+    });
+
+    // Wire sidebar buttons
+    document.querySelectorAll('.nav-link[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => navigate(btn.dataset.target));
+    });
+
+    // Navigate to the page that was in the hash (saved by the inline script above)
+    navigate(window.__startPage || 'introduction');
+
+    // ── Platform tabs ────────────────────────
+    function switchTab(group, tab, btn) {
+      btn.parentElement.querySelectorAll('.plat-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.querySelectorAll(`[id^="${group}-"]`).forEach(el => el.classList.remove('active'));
+      const pane = document.getElementById(`${group}-${tab}`);
+      if (pane) pane.classList.add('active');
+    }
+
+    // ── FAQ accordion ────────────────────────
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // ── Copy code ────────────────────────────
+    function copyCode(btn) {
+      const code = btn.closest('.code-wrap').querySelector('code');
+      navigator.clipboard.writeText(code.innerText).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    // ── Mobile menu ──────────────────────────
+    function toggleMobileMenu() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('mob-overlay').classList.toggle('open');
+    }
+</script>
+
+</body>
+</html>
