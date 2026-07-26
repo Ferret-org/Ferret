@@ -16,8 +16,9 @@
 
 ---
 
-<div style="display: flex; align-items: flex-start; gap: 24px;">
-<div style="flex: 1;">
+<table>
+<tr>
+<td valign="top">
 ### 📑 Table of Contents
 
 - [Getting Started 👣](#getting-started)
@@ -30,11 +31,12 @@
 - [Sample App 📱](#sample-app)
 - [FAQ ❓](#faq)
 - [License 📄](#license)
-</div>
-
-<div>
-<img src="ferret.jpg" width="500" height="500" alt="Ferret logo" /></div>
-</div>
+</td>
+<td valign="top" align="center">
+<img src="ferret.jpg" width="500" height="500" alt="Ferret logo" />
+</td>
+</tr>
+</table>
 
 ---
 
