@@ -1,6 +1,6 @@
-<div align="center"> <img src="ferret.jpg" width="3840" alt="Ferret logo" />
+<div align="center">
 # Ferret
-
+<img src="ferret.jpg" width="1000" height="1000" alt="Ferret logo" />
 **Ferret out every HTTP request and WebSocket message your app sends and receives.**
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.ferret-org/ferret?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.ferret-org/ferret)
