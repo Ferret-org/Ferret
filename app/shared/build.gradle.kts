@@ -75,7 +75,7 @@ kotlin {
 
             implementation(libs.kermit.logging)
 
-            implementation(libs.ferret.lib)
+            implementation(libs.ferret)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
