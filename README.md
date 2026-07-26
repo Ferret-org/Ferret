@@ -46,7 +46,7 @@ Ferret is distributed through Maven Central. Add the dependency to your shared/c
 **`libs.versions.toml`**
 ```toml
 [versions]
-ferret = "1.0.0"
+ferret = "latest version"
 
 [libraries]
 ferret = { module = "io.github.ferret-org:ferret", version.ref = "ferret" }
