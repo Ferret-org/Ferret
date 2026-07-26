@@ -16,7 +16,7 @@
 
 ---
 
-<table>
+<table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td valign="top">
 ### 📑 Table of Contents
