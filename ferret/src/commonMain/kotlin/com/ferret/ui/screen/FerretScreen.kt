@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -22,10 +23,12 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +39,7 @@ import com.ferret.ui.components.FerretNetworkCard
 import com.ferret.ui.components.FerretSearchBar
 import com.ferret.ui.theme.FerretTypography
 import com.ferret.viewModel.FerretViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun FerretNetworkListScreen(
@@ -47,6 +51,23 @@ fun FerretNetworkListScreen(
     val query by ferretViewModel.searchQuery.collectAsStateWithLifecycle()
 
     var showDeleteDialog by rememberSaveable() { mutableStateOf(false) }
+
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItems = layoutInfo.totalItemsCount
+            lastVisibleIndex to totalItems
+        }
+            .distinctUntilChanged()
+            .collect { (lastVisibleIndex, totalItems) ->
+                if (totalItems > 0 && lastVisibleIndex >= totalItems - 5) {
+                    ferretViewModel.loadMoreSessions()
+                }
+            }
+    }
 
     MaterialTheme {
         Scaffold(
@@ -82,6 +103,7 @@ fun FerretNetworkListScreen(
             }
         ) { paddingValues ->
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -133,6 +155,23 @@ fun FerretNetworkListScreen(
                             requestDate = ferretItem.requestDate,
                             responsePayloadSize = ferretItem.responsePayloadSize,
                         )
+                    }
+                }
+
+                if (ferretState.hasMore) {
+                    item(key = "loading-footer") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            Text(
+                                text = "Loading more…",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
             }

@@ -10,6 +10,7 @@ import com.ferret.usecase.GetNetworkRecordUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,11 +23,16 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class FerretViewModel(
     private val getTransactionUseCase: GetNetworkRecordUseCase,
     private val clearDatabaseUseCase: ClearDatabaseUseCase,
 ) : ViewModel() {
+
+    private companion object {
+        const val PAGE_SIZE = 5
+    }
 
     private val selectedTab = MutableStateFlow(FerretTab.ALL)
 
@@ -35,12 +41,20 @@ class FerretViewModel(
     val searchQuery: StateFlow<String> =
         _searchQuery.asStateFlow()
 
+    private val visibleSessionCount = MutableStateFlow(PAGE_SIZE)
+
     fun selectTab(tab: FerretTab) {
         selectedTab.value = tab
+        visibleSessionCount.value = PAGE_SIZE
     }
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
+        visibleSessionCount.value = PAGE_SIZE
+    }
+
+    fun loadMoreSessions() {
+        visibleSessionCount.value += PAGE_SIZE
     }
 
     @OptIn(FlowPreview::class)
@@ -50,7 +64,8 @@ class FerretViewModel(
         _searchQuery
             .debounce(300.milliseconds)
             .distinctUntilChanged(),
-    ) { networkRecords, tab, query ->
+        visibleSessionCount,
+    ) { networkRecords, tab, query, visibleCount ->
 
         val filteredByTab = when (tab) {
             FerretTab.ALL -> {
@@ -82,7 +97,7 @@ class FerretViewModel(
             }
         }
 
-        val sessions = filteredRecords
+        val allSessions = filteredRecords
             .groupBy { it.sessionId }
             .map { (sessionId, records) ->
                 val sortedRecords = records.sortedByDescending {
@@ -101,10 +116,13 @@ class FerretViewModel(
                 it.latestRequestDate
             }
 
+        val pagedSessions = allSessions.take(visibleCount)
+
         FerretUiState(
             selectedTab = tab,
             searchQuery = query,
-            sessions = sessions,
+            sessions = pagedSessions,
+            hasMore = allSessions.size > pagedSessions.size,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -118,11 +136,13 @@ class FerretViewModel(
         }
     }
 }
+
 data class FerretUiState(
     val selectedTab: FerretTab = FerretTab.ALL,
     val sessions: List<NetworkSession> = emptyList(),
     val searchQuery: String = "",
     val hasActiveFilters: Boolean = false,
+    val hasMore: Boolean = false,
 )
 
 data class NetworkSession(
