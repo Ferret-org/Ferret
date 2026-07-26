@@ -13,5 +13,8 @@ internal actual class FerretRepository(
     private val database = DatabaseFactory.createDatabase()
 
     actual val networkRecordRepository: NetworkRecordRepository =
-        NetworkRecordRepositoryImpl(database.networkRecordDao())
+        NetworkRecordRepositoryImpl(
+            dao = database.networkRecordDao(),
+            retentionDurationMs = configuration.retentionDurationHours * 60 * 60 * 1000
+        )
 }

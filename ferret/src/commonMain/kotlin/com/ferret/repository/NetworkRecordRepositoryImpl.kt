@@ -7,10 +7,15 @@ import com.ferret.database.mapper.toEntity
 import com.ferret.model.NetworkRecord
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 internal class NetworkRecordRepositoryImpl(
-    private val dao: NetworkRecordDao
+    private val dao: NetworkRecordDao,
+    private val retentionDurationMs: Long = DEFAULT_RETENTION_MS,
 ) : NetworkRecordRepository {
+
+    private fun cutoffTimestamp(): Long =
+        kotlin.time.Clock.System.now().toEpochMilliseconds() - retentionDurationMs
 
     override suspend fun insert(networkRecord: NetworkRecord): Long =
         dao.insert(networkRecord.toEntity())
@@ -67,12 +72,20 @@ internal class NetworkRecordRepositoryImpl(
     override suspend fun getById(id: Long): NetworkRecord? =
         dao.getById(id)?.toDomain()
 
-    override suspend fun getAll(): List<NetworkRecord> =
-        dao.getAll().map(NetworkRecordEntity::toDomain)
+    override suspend fun getAll(): List<NetworkRecord> {
+        dao.deleteOlderThan(cutoffTimestamp())
+        return dao.getAll().map(NetworkRecordEntity::toDomain)
+    }
 
     override fun observeAll(): Flow<List<NetworkRecord>> =
-        dao.observeAll().map { list -> list.map(NetworkRecordEntity::toDomain) }
+        dao.observeAll()
+            .onStart { dao.deleteOlderThan(cutoffTimestamp()) }
+            .map { list -> list.map(NetworkRecordEntity::toDomain) }
 
     override suspend fun deleteOlderThan(timestamp: Long) =
         dao.deleteOlderThan(timestamp)
+
+    companion object {
+        private const val DEFAULT_RETENTION_MS = 12L * 60 * 60 * 1000
+    }
 }

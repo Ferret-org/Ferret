@@ -2,6 +2,7 @@ package com.ferret.socket
 
 import com.ferret.FerretSdk
 import com.ferret.model.WebSocketEvent
+import com.ferret.notification.NotificationKit
 import com.ferret.usecase.SaveWebSocketEventUseCase
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.DefaultWebSocketSession
@@ -41,6 +42,10 @@ internal class FerretMonitoringWebSocketSession(
     init {
         launch {
             useCase?.save(WebSocketEvent.Connected(connectionId, connectedAt, url))
+            NotificationKit.push {
+                title("WS Connected")
+                message(url)
+            }
         }
 
         launch {
@@ -48,17 +53,22 @@ internal class FerretMonitoringWebSocketSession(
                 if (frame !is Frame.Close) {
                     val count = frameCounter.addAndGet(1)
                     launch {
+                        val data = frame.toReadableString()
                         useCase?.save(
                             WebSocketEvent.FrameSent(
                                 connectionId = connectionId,
                                 timestamp = kotlin.time.Clock.System.now().toEpochMilliseconds(),
                                 frameType = frame.frameType.name,
-                                data = frame.toReadableString(),
+                                data = data,
                                 sizeBytes = frame.data.size.toLong(),
                                 count = count,
                                 url = url
                             )
                         )
+                        NotificationKit.push {
+                            title("Frame Out")
+                            message(data.take(NOTIFICATION_PREVIEW_LENGTH).ifBlank { frame.frameType.name })
+                        }
                     }
                 }
                 try {
@@ -75,18 +85,23 @@ internal class FerretMonitoringWebSocketSession(
                     if (frame !is Frame.Close) {
                         val count = frameCounter.addAndGet(1)
                         launch {
+                            val data = frame.toReadableString()
                             useCase?.save(
                                 WebSocketEvent.FrameReceived(
                                     connectionId = connectionId,
                                     timestamp = kotlin.time.Clock.System.now()
                                         .toEpochMilliseconds(),
                                     frameType = frame.frameType.name,
-                                    data = frame.toReadableString(),
+                                    data = data,
                                     sizeBytes = frame.data.size.toLong(),
                                     count = count,
                                     url = url
                                 )
                             )
+                            NotificationKit.push {
+                                title("Frame In")
+                                message(data.take(NOTIFICATION_PREVIEW_LENGTH).ifBlank { frame.frameType.name })
+                            }
                         }
                     }
                     send(frame)
@@ -102,6 +117,10 @@ internal class FerretMonitoringWebSocketSession(
                             url = url
                         )
                     )
+                    NotificationKit.push {
+                        title("WS Disconnected")
+                        message(url)
+                    }
                 }
             }
         }
@@ -117,5 +136,6 @@ internal class FerretMonitoringWebSocketSession(
 
     companion object {
         private const val MAX_PAYLOAD_BYTES = 65_536
+        private const val NOTIFICATION_PREVIEW_LENGTH = 60
     }
 }

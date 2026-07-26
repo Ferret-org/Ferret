@@ -1,19 +1,19 @@
 package com.ferret.notification
 
 import com.ferret.ui.FerretIosUi
-import platform.UserNotifications.UNAuthorizationOptionAlert
-import platform.UserNotifications.UNAuthorizationOptionBadge
-import platform.UserNotifications.UNAuthorizationOptionSound
 import platform.UserNotifications.UNNotification
+import platform.UserNotifications.UNNotificationPresentationOptionBadge
+import platform.UserNotifications.UNNotificationPresentationOptionList
+import platform.UserNotifications.UNNotificationPresentationOptionSound
 import platform.UserNotifications.UNNotificationPresentationOptions
 import platform.UserNotifications.UNNotificationResponse
 import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 
-internal class FerretNotificationDelegate :
-    NSObject(),
-    UNUserNotificationCenterDelegateProtocol {
+internal class FerretNotificationDelegate : NSObject(), UNUserNotificationCenterDelegateProtocol {
 
     override fun userNotificationCenter(
         center: UNUserNotificationCenter,
@@ -21,9 +21,9 @@ internal class FerretNotificationDelegate :
         withCompletionHandler: (UNNotificationPresentationOptions) -> Unit,
     ) {
         withCompletionHandler(
-            UNAuthorizationOptionAlert or
-                    UNAuthorizationOptionSound or
-                    UNAuthorizationOptionBadge
+            UNNotificationPresentationOptionList or
+                    UNNotificationPresentationOptionSound or
+                    UNNotificationPresentationOptionBadge
         )
     }
 
@@ -47,7 +47,9 @@ internal class FerretNotificationDelegate :
                         FerretNotificationKeys.TYPE_FERRET
 
             if (isFerretNotification) {
-                FerretIosUi.open()
+                dispatch_async(dispatch_get_main_queue()) {
+                    FerretIosUi.open()
+                }
             }
         } catch (throwable: Throwable) {
             println(

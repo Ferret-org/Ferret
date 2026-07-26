@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
@@ -22,9 +21,10 @@ internal actual class NotificationController actual constructor(
     private val channels = NotificationChannelManager(context)
     private val pendingIntents = PendingIntentFactory(context)
 
-    init {
-        channels.ensure(configuration.defaultChannel)
-    }
+    private val channelId: String = channels.ensure(
+        spec = configuration.defaultChannel,
+        priority = configuration.defaultPriority
+    )
 
     actual fun push(model: NotificationModel): Int {
         val stored = buffer.push(model)
@@ -54,7 +54,7 @@ internal actual class NotificationController actual constructor(
 
     private fun render(entries: List<NotificationModel>): Notification {
         val newest = entries.first()
-        val builder = NotificationCompat.Builder(context, configuration.defaultChannel.id)
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(resolveSmallIcon())
             .setContentTitle(newest.title)
             .setContentText(newest.message)
@@ -84,10 +84,7 @@ internal actual class NotificationController actual constructor(
 
     private fun cancel(id: Int) = managerCompat.cancel(id)
 
-    private fun areNotificationsEnabled(): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            systemManager.areNotificationsEnabled()
-        } else true
+    private fun areNotificationsEnabled(): Boolean = systemManager.areNotificationsEnabled()
 
     private fun resolveSmallIcon(): Int =
         if (configuration.defaultSmallIcon != 0) configuration.defaultSmallIcon
