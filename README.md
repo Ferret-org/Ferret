@@ -20,6 +20,7 @@
 ### 📑 Table of Contents
 
 - [Getting Started 👣](#getting-started)
+- [Demo 🎥](#demo)
 - [Features 🧰](#features)
 - [Android Setup 🤖](#android-setup)
 - [iOS Setup 🍎](#ios-setup)
@@ -62,6 +63,22 @@ kotlin {
     }
 }
 ```
+
+<a id="demo"></a>
+## Demo 🎥
+
+Screen recording in action, capturing a debugging session alongside the network activity that caused it:
+
+**Android**
+
+<video src="app/android.mp4" controls width="600"></video>
+
+**iOS**
+
+<video src="app/ios.mp4" controls width="600"></video>
+
+---
+
 
 ### Requirements
 
