@@ -61,30 +61,19 @@ kotlin {
 }
 ```
 
-Then install `Ferret` as a plugin on your Ktor `HttpClient`:
-
-```kotlin
-val client = HttpClient(OkHttp) {
-    install(Ferret) {
-        context = applicationContext // Android only
-    }
-}
-```
-
-That's it. Ferret will now record every request, response, and WebSocket message made through `client`.
-
 ### Requirements
+
+These are the versions Ferret is built and tested with. Kotlin is confirmed to work down to `1.9.0`; the other tools (AGP, Gradle, Compose Multiplatform, Ktor) may work with older versions too, but that hasn't been verified yet. `minSdk 28` is the one hard floor here: it's declared in the library's own manifest, so any app consuming Ferret needs a `minSdk` of at least 28.
 
 | Tool | Version |
 |---|---|
-| Kotlin | 2.4.0 |
+| Kotlin | 1.9.0+ (built and tested with 2.4.0) |
 | Android Gradle Plugin | 9.2.1 |
 | Gradle | 9.4.1 |
 | Compose Multiplatform | 1.10.x / 1.11.x |
 | Ktor | 3.5.1 |
 | Android `minSdk` | 28 |
 | Android `compileSdk` / `targetSdk` | 37 |
-
 Your project must already use Ktor for networking, Ferret plugs into `HttpClient` directly.
 
 ---
@@ -172,22 +161,35 @@ No context is required on iOS. Initialization happens automatically the first ti
 
 There's no OS-level shortcut on iOS, so you decide how the inspector is triggered (a debug menu item, a hidden gesture, a shake handler, etc.), then present the view controller Ferret exposes:
 
-```kotlin
-import com.ferret.ui.ferretViewController
+[//]: # (```kotlin)
 
-someUIViewController.presentViewController(
-    ferretViewController(),
-    animated = true,
-    completion = null
-)
-```
+[//]: # (import com.ferret.ui.ferretViewController)
 
-From Swift, if `ferretViewController()` is exposed through your Kotlin/Native framework:
+[//]: # ()
+[//]: # (someUIViewController.presentViewController&#40;)
 
-```swift
-let controller = FerretUiKt.ferretViewController()
-present(controller, animated: true)
-```
+[//]: # (    ferretViewController&#40;&#41;,)
+
+[//]: # (    animated = true,)
+
+[//]: # (    completion = null)
+
+[//]: # (&#41;)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (From Swift, if `ferretViewController&#40;&#41;` is exposed through your Kotlin/Native framework:)
+
+[//]: # ()
+[//]: # (```swift)
+
+[//]: # (let controller = FerretUiKt.ferretViewController&#40;&#41;)
+
+[//]: # (present&#40;controller, animated: true&#41;)
+
+[//]: # (```)
+That's it. Ferret will now record every request, response, and WebSocket message made through `client`.
 
 ---
 
@@ -210,23 +212,39 @@ All of this stays on-device. Nothing captured by Ferret is sent anywhere.
 <a id="configure"></a>
 ## Configure 🎨
 
-Customize notification behavior with a `FerretConfiguration`:
+Ferret is configured through a single `FerretConfiguration` passed to `install(Ferret) { ... }`. Right now it only has one section, notifications, but it's structured so more configuration areas can be added here later without changing how you already use it.
 
 ```kotlin
 install(Ferret) {
     context = applicationContext // Android only
     configuration = FerretConfiguration(
-        notifications = NotificationConfiguration(
-            maxBufferSize = 5,                     // number of recent requests kept in the notification
-            defaultPriority = NotificationPriority.HIGH,
-            defaultSmallIcon = R.drawable.ic_notification
-        )
+        notifications = NotificationConfiguration(/* see below */)
     )
 }
 ```
 
-If omitted, `FerretConfiguration()` defaults are used.
+If you don't pass a `configuration`, `FerretConfiguration()` defaults are used.
 
+### Notification configuration
+
+Controls the rolling capture notification: how many recent requests it shows, its priority, its channel, and its icon.
+
+```kotlin
+NotificationConfiguration(
+    maxBufferSize = 5,                     // number of recent requests kept in the notification
+    defaultPriority = NotificationPriority.HIGH,
+    defaultChannel = NotificationChannelSpec(),
+    defaultSmallIcon = R.drawable.ic_notification // Android only
+)
+```
+
+| Property | Default | Description |
+|---|---|---|
+| `maxBufferSize` | `5` | Number of recent requests shown in the rolling notification |
+| `defaultPriority` | `NotificationPriority.HIGH` | Priority used for the notification |
+| `defaultChannel` | `NotificationChannelSpec()` | The notification channel (id, name, priority) the notification is posted to |
+| `defaultSmallIcon` | System default icon | Small icon resource for the notification (Android only) |
+ 
 ---
 
 <a id="notification-permission"></a>
@@ -261,24 +279,28 @@ open app/iosApp -a Xcode   # then run from Xcode
 ## FAQ ❓
 
 **Does Ferret support WebSockets?**
+
 Yes. Ferret captures WebSocket connections and messages in addition to regular HTTP requests and responses, both show up together in the same inspector networkRecord list.
 
 **How do I open the Ferret interface?**
+
 There are two built-in ways, no code needed once the plugin is installed:
 - **Notification**: tap the rolling Ferret notification to open the inspector directly.
 - **Home-screen shortcut (Android)**: long-press your app's icon and select "Open Ferret Inspector" from the shortcut menu.
-
-On iOS there's no shortcut, since the OS doesn't support it the same way, so you present `ferretViewController()` from wherever makes sense in your app (a debug menu, a hidden gesture, etc.) as shown in [iOS Setup](#ios-setup).
+  On iOS there's no shortcut, since the OS doesn't support it the same way, so you present `ferretViewController()` from wherever makes sense in your app (a debug menu, a hidden gesture, etc.) as shown in [iOS Setup](#ios-setup).
 
 **Does Ferret work without Ktor?**
+
 No. Ferret is implemented as a Ktor `HttpClient` plugin, so your networking layer needs to go through Ktor.
 
 **Does Ferret slow down my release build?**
+
 Ferret is meant for development and internal builds. If you don't want it in production, gate the `install(Ferret)` call behind a debug flag, or swap in a plain client for release builds.
 
 **Is captured data sent anywhere?**
-No. Everything is stored locally in an on-device Room database and never leaves the app.
 
+No. Everything is stored locally in an on-device Room database and never leaves the app.
+ 
 ---
 
 <a id="license"></a>

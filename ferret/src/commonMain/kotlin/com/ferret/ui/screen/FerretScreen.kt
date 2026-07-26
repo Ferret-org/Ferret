@@ -3,14 +3,20 @@ package com.ferret.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -102,75 +109,93 @@ fun FerretNetworkListScreen(
                 }
             }
         ) { paddingValues ->
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-            ) {
-                ferretState.sessions.forEach { session ->
+            when {
+                ferretState.isLoading -> Unit
 
-                    item(
-                        key = "session-${session.sessionId}",
-                    ) {
-                        FerretSessionHeader(
-                            sessionId = session.sessionId,
-                            requestCount = session.records.size,
-                        )
-                    }
-
-                    items(
-                        items = session.records,
-                        key = { record ->
-                            record.id
-                        },
-                    ) { ferretItem ->
-                        val displayPath = when {
-                            ferretItem.path.isNotBlank() -> ferretItem.path
-                            !ferretItem.requestBody.isNullOrBlank() -> ferretItem.requestBody
-                            !ferretItem.responseBody.isNullOrBlank() -> ferretItem.responseBody
-                            else -> "WebSocket"
-                        }
-
-                        val displayHost = when {
-                            ferretItem.host.isNotBlank() -> ferretItem.host
-
-                            !ferretItem.requestBody.isNullOrBlank() ->
-                                ferretItem.requestBody
-
-                            !ferretItem.responseBody.isNullOrBlank() ->
-                                ferretItem.responseBody
-
-                            else -> "WebSocket"
-                        }
-
-                        FerretNetworkCard(
-                            onClick = onItemClick,
-                            id = ferretItem.id,
-                            method = ferretItem.method.orEmpty(),
-                            path = displayPath,
-                            host = displayHost,
-                            responseCode = ferretItem.responseCode ?: 0,
-                            tookMs = ferretItem.tookMs ?: 0,
-                            requestDate = ferretItem.requestDate,
-                            responsePayloadSize = ferretItem.responsePayloadSize,
-                        )
-                    }
+                ferretState.sessions.isEmpty() -> {
+                    EmptyNetworkState(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    )
                 }
 
-                if (ferretState.hasMore) {
-                    item(key = "loading-footer") {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            horizontalArrangement = Arrangement.Center,
-                        ) {
-                            Text(
-                                text = "Loading more…",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                else -> {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                    ) {
+                        ferretState.sessions.forEach { session ->
+
+                            item(
+                                key = "session-${session.sessionId}",
+                            ) {
+                                FerretSessionHeader(
+                                    sessionId = session.sessionId,
+                                    requestCount = session.records.size,
+                                )
+                            }
+
+                            itemsIndexed(
+                                items = session.records,
+                                key = { _, record -> record.id },
+                            ) { index, ferretItem ->
+                                val displayPath = when {
+                                    ferretItem.path.isNotBlank() -> ferretItem.path
+                                    !ferretItem.requestBody.isNullOrBlank() -> ferretItem.requestBody
+                                    !ferretItem.responseBody.isNullOrBlank() -> ferretItem.responseBody
+                                    else -> "WebSocket"
+                                }
+
+                                val displayHost = when {
+                                    ferretItem.host.isNotBlank() -> ferretItem.host
+
+                                    !ferretItem.requestBody.isNullOrBlank() ->
+                                        ferretItem.requestBody
+
+                                    !ferretItem.responseBody.isNullOrBlank() ->
+                                        ferretItem.responseBody
+
+                                    else -> "WebSocket"
+                                }
+
+                                Column {
+                                    FerretNetworkCard(
+                                        onClick = onItemClick,
+                                        id = ferretItem.id,
+                                        method = ferretItem.method.orEmpty(),
+                                        path = displayPath,
+                                        host = displayHost,
+                                        responseCode = ferretItem.responseCode ?: 0,
+                                        tookMs = ferretItem.tookMs ?: 0,
+                                        requestDate = ferretItem.requestDate,
+                                        responsePayloadSize = ferretItem.responsePayloadSize,
+                                    )
+
+                                    if (index != session.records.lastIndex) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                    }
+                                }
+                            }
+                        }
+
+                        if (ferretState.hasMore) {
+                            item(key = "loading-footer") {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Text(
+                                        text = "Loading more…",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -188,6 +213,40 @@ fun FerretNetworkListScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyNetworkState(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.WifiOff,
+            contentDescription = null,
+            modifier = Modifier.size(72.dp),
+            tint = MaterialTheme.colorScheme.outline,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "No network records",
+            style = FerretTypography.titleMedium,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Network requests will appear here once they are captured.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
