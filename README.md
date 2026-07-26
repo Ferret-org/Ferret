@@ -63,7 +63,7 @@ kotlin {
 
 ### Requirements
 
-These are the versions Ferret is built and tested with. Kotlin is confirmed to work down to `1.9.0`; the other tools (AGP, Gradle, Compose Multiplatform, Ktor) may work with older versions too, but that hasn't been verified yet. `minSdk 28` is the one hard floor here: it's declared in the library's own manifest, so any app consuming Ferret needs a `minSdk` of at least 28.
+These are the versions Ferret is built and tested with. Kotlin is confirmed to work down to `1.9.0` the other tools (AGP, Gradle, Compose Multiplatform, Ktor) may work with older versions too, but that hasn't been verified yet. `minSdk 28` is the one hard floor here: it's declared in the library's own manifest, so any app consuming Ferret needs a `minSdk` of at least 28.
 
 | Tool | Version |
 |---|---|
@@ -119,7 +119,7 @@ val client = HttpClient(OkHttp) {
 }
 ```
 
-`context` should be an Android `Context`; an `Application` context is recommended so it survives configuration changes.
+`context` should be an Android `Context` an `Application` context is recommended so it survives configuration changes.
 
 The first time the plugin initializes, Ferret automatically:
 
