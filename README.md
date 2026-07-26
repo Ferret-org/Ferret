@@ -71,11 +71,11 @@ Screen recording in action, capturing a debugging session alongside the network 
 
 **Android**
 
-<video src="app/android.mp4" controls width="600"></video>
+<video src="app/android.MP4" controls width="600"></video>
 
 **iOS**
 
-<video src="app/ios.mp4" controls width="600"></video>
+<video src="app/ios.MP4" controls width="600"></video>
 
 ---
 
