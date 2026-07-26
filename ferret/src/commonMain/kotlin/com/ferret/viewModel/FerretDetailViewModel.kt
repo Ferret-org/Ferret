@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ferret.model.NetworkRecord
 import com.ferret.ui.navigation.FerretDestination
-import com.ferret.usecase.GetTransactionByIdUseCase
+import com.ferret.usecase.GetNetworkRecordByIdUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FerretDetailViewModel(
-    private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
+    private val getNetworkRecordByIdUseCase: GetNetworkRecordByIdUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -37,7 +37,7 @@ class FerretDetailViewModel(
 
     private fun loadTransaction() {
         viewModelScope.launch(Dispatchers.IO) {
-            _ferretDetail.value = getTransactionByIdUseCase(networkId)
+            _ferretDetail.value = getNetworkRecordByIdUseCase(networkId)
         }
     }
 }

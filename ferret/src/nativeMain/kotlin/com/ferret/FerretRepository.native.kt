@@ -1,14 +1,14 @@
 package com.ferret
 
 import com.ferret.database.DatabaseFactory
-import com.ferret.repository.TransactionRepository
-import com.ferret.repository.TransactionRepositoryImpl
+import com.ferret.repository.NetworkRecordRepository
+import com.ferret.repository.NetworkRecordRepositoryImpl
 
 
 internal actual class FerretRepository() {
 
     private val database = DatabaseFactory.createDatabase()
 
-    actual val transactionRepository: TransactionRepository =
-        TransactionRepositoryImpl(database.transactionDao())
+    actual val networkRecordRepository: NetworkRecordRepository =
+        NetworkRecordRepositoryImpl(database.networkRecordDao())
 }

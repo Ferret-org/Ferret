@@ -1,6 +1,6 @@
 package com.ferret.repository
 
-import com.ferret.database.dao.TransactionDao
+import com.ferret.database.dao.NetworkRecordDao
 import com.ferret.database.entity.NetworkRecordEntity
 import com.ferret.database.mapper.toDomain
 import com.ferret.database.mapper.toEntity
@@ -8,15 +8,15 @@ import com.ferret.model.NetworkRecord
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class TransactionRepositoryImpl(
-    private val dao: TransactionDao
-) : TransactionRepository {
+internal class NetworkRecordRepositoryImpl(
+    private val dao: NetworkRecordDao
+) : NetworkRecordRepository {
 
-    override suspend fun insert(transaction: NetworkRecord): Long =
-        dao.insert(transaction.toEntity())
+    override suspend fun insert(networkRecord: NetworkRecord): Long =
+        dao.insert(networkRecord.toEntity())
 
-    override suspend fun update(transaction: NetworkRecord) =
-        dao.update(transaction.toEntity())
+    override suspend fun update(networkRecord: NetworkRecord) =
+        dao.update(networkRecord.toEntity())
 
     override suspend fun updateResponse(
         id: Long,
@@ -58,8 +58,8 @@ internal class TransactionRepositoryImpl(
         error = error,
     )
 
-    override suspend fun delete(transaction: NetworkRecord) =
-        dao.delete(transaction.toEntity())
+    override suspend fun delete(networkRecord: NetworkRecord) =
+        dao.delete(networkRecord.toEntity())
 
     override suspend fun clear() =
         dao.clear()

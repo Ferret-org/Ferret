@@ -9,7 +9,7 @@ import com.ferret.model.NetworkRecord
 import com.ferret.notification.NotificationKit
 import com.ferret.socket.FerretMonitoringWebSocketSession
 import com.ferret.usecase.InitializeFerretUseCase
-import com.ferret.usecase.SaveTransactionUseCase
+import com.ferret.usecase.SaveNetworkRecordUseCase
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.save
@@ -68,8 +68,8 @@ private object FerretMonitorPlugin : HttpClientPlugin<Unit, FerretMonitorPlugin>
                 return@intercept execute(request)
             }
 
-            val useCase = runCatching { FerretSdk.transactionRepository }
-                .getOrNull()?.let(::SaveTransactionUseCase)
+            val useCase = runCatching { FerretSdk.networkRecordRepository }
+                .getOrNull()?.let(::SaveNetworkRecordUseCase)
             val startTime = System.currentTimeMillis()
             val requestHeaders = request.headers.build().entries()
                 .flatMap { (key, values) -> values.map { Header(key, it) } }

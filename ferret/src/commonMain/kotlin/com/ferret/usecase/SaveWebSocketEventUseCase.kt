@@ -2,10 +2,10 @@ package com.ferret.usecase
 
 import com.ferret.model.NetworkRecord
 import com.ferret.model.WebSocketEvent
-import com.ferret.repository.TransactionRepository
+import com.ferret.repository.NetworkRecordRepository
 
 internal class SaveWebSocketEventUseCase(
-    private val repository: TransactionRepository
+    private val repository: NetworkRecordRepository
 ) {
     suspend fun save(event: WebSocketEvent) {
         repository.insert(event.toNetworkRecord())

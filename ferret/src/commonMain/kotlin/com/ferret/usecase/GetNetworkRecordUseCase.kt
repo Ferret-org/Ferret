@@ -2,10 +2,10 @@ package com.ferret.usecase
 
 import com.ferret.repository.NetworkRecordRepository
 
-class ClearDatabaseUseCase(
+class GetNetworkRecordUseCase(
     private val repository: NetworkRecordRepository
 ) {
 
-    suspend operator fun invoke()= repository.clear()
+    operator fun invoke()= repository.observeAll()
 
 }

@@ -4,5 +4,5 @@ internal object DatabaseConstants {
     const val DATABASE_NAME = "ferret.db"
     const val DATABASE_VERSION = 1
 
-    const val TRANSACTIONS_TABLE = "transactions"
+    const val NETWORK_RECORD_TABLE = "networkRecords"
 }

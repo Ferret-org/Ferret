@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9e2ae228def367e9c5a0a015bff93788",
+    "identityHash": "de584b4b673b0540f17070390ab9648f",
     "entities": [
       {
-        "tableName": "transactions",
+        "tableName": "networkRecords",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` TEXT NOT NULL, `requestDate` INTEGER NOT NULL, `responseDate` INTEGER, `tookMs` INTEGER, `protocol` TEXT NOT NULL, `method` TEXT, `url` TEXT NOT NULL, `host` TEXT NOT NULL, `path` TEXT NOT NULL, `scheme` TEXT NOT NULL, `responseTlsVersion` TEXT, `responseCipherSuite` TEXT, `requestPayloadSize` INTEGER NOT NULL, `requestContentType` TEXT, `requestHeaders` TEXT NOT NULL, `requestHeadersSize` INTEGER NOT NULL, `requestBody` TEXT, `isRequestBodyEncoded` INTEGER NOT NULL, `responseCode` INTEGER, `responseMessage` TEXT, `error` TEXT, `responsePayloadSize` INTEGER NOT NULL, `responseContentType` TEXT, `responseHeaders` TEXT NOT NULL, `responseHeadersSize` INTEGER NOT NULL, `responseBody` TEXT, `isResponseBodyEncoded` INTEGER NOT NULL)",
         "fields": [
           {
@@ -173,47 +173,47 @@
         },
         "indices": [
           {
-            "name": "index_transactions_sessionId",
+            "name": "index_networkRecords_sessionId",
             "unique": false,
             "columnNames": [
               "sessionId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_networkRecords_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
           },
           {
-            "name": "index_transactions_requestDate",
+            "name": "index_networkRecords_requestDate",
             "unique": false,
             "columnNames": [
               "requestDate"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_requestDate` ON `${TABLE_NAME}` (`requestDate`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_networkRecords_requestDate` ON `${TABLE_NAME}` (`requestDate`)"
           },
           {
-            "name": "index_transactions_responseCode",
+            "name": "index_networkRecords_responseCode",
             "unique": false,
             "columnNames": [
               "responseCode"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_responseCode` ON `${TABLE_NAME}` (`responseCode`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_networkRecords_responseCode` ON `${TABLE_NAME}` (`responseCode`)"
           },
           {
-            "name": "index_transactions_protocol",
+            "name": "index_networkRecords_protocol",
             "unique": false,
             "columnNames": [
               "protocol"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_protocol` ON `${TABLE_NAME}` (`protocol`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_networkRecords_protocol` ON `${TABLE_NAME}` (`protocol`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e2ae228def367e9c5a0a015bff93788')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'de584b4b673b0540f17070390ab9648f')"
     ]
   }
 }

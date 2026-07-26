@@ -9,7 +9,7 @@ import com.ferret.database.entity.NetworkRecordEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface TransactionDao {
+interface NetworkRecordDao {
 
     @Insert
     suspend fun insert(entity: NetworkRecordEntity): Long
@@ -21,7 +21,7 @@ interface TransactionDao {
     suspend fun delete(entity: NetworkRecordEntity)
 
     @Query("""
-        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        UPDATE ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         SET responseDate         = :responseDate,
             tookMs               = :tookMs,
             responseCode         = :responseCode,
@@ -51,7 +51,7 @@ interface TransactionDao {
     )
 
     @Query("""
-        UPDATE ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        UPDATE ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         SET responseDate = :responseDate,
             tookMs       = :tookMs,
             error        = :error
@@ -64,29 +64,29 @@ interface TransactionDao {
         error: String?,
     )
 
-    @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}")
+    @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}")
     suspend fun clear()
 
     @Query("""
-        SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SELECT * FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         ORDER BY requestDate DESC
     """)
     fun observeAll(): Flow<List<NetworkRecordEntity>>
 
     @Query("""
-        SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SELECT * FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         WHERE id = :id
     """)
     suspend fun getById(id: Long): NetworkRecordEntity?
 
     @Query("""
-        SELECT * FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        SELECT * FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         ORDER BY requestDate DESC
     """)
     suspend fun getAll(): List<NetworkRecordEntity>
 
     @Query("""
-        DELETE FROM ${com.ferret.database.DatabaseConstants.TRANSACTIONS_TABLE}
+        DELETE FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         WHERE requestDate < :timestamp
     """)
     suspend fun deleteOlderThan(timestamp: Long)

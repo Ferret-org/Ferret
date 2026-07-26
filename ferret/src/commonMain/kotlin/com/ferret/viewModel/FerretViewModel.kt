@@ -5,9 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.ferret.FerretSdk
 import com.ferret.common.FerretTab
 import com.ferret.model.NetworkRecord
-import com.ferret.repository.TransactionRepository
 import com.ferret.usecase.ClearDatabaseUseCase
-import com.ferret.usecase.GetTransactionUseCase
+import com.ferret.usecase.GetNetworkRecordUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
@@ -25,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 class FerretViewModel(
-    private val getTransactionUseCase: GetTransactionUseCase,
+    private val getTransactionUseCase: GetNetworkRecordUseCase,
     private val clearDatabaseUseCase: ClearDatabaseUseCase,
 ) : ViewModel() {
 
