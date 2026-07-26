@@ -1,5 +1,4 @@
-<div align="center">
-
+<div align="center"> <img src="ferret.jpg" width="3840" alt="Ferret logo" />
 # Ferret
 
 **Ferret out every HTTP request and WebSocket message your app sends and receives.**
@@ -226,15 +225,15 @@ install(Ferret) {
 If you don't pass a `configuration`, `FerretConfiguration()` defaults are used.
 
 ### Notification configuration
-
-Controls the rolling capture notification: how many recent requests it shows, its priority, its channel, and its icon.
+Controls the rolling capture notification: how many recent requests it shows, its priority, its channel, its icon, and whether Ferret requests the notification permission itself.
 
 ```kotlin
 NotificationConfiguration(
     maxBufferSize = 5,                     // number of recent requests kept in the notification
     defaultPriority = NotificationPriority.HIGH,
     defaultChannel = NotificationChannelSpec(),
-    defaultSmallIcon = R.drawable.ic_notification // Android only
+    defaultSmallIcon = R.drawable.ic_notification, // Android only
+    requestPermission = true               // let Ferret ask for POST_NOTIFICATIONS itself
 )
 ```
 
@@ -244,20 +243,43 @@ NotificationConfiguration(
 | `defaultPriority` | `NotificationPriority.HIGH` | Priority used for the notification |
 | `defaultChannel` | `NotificationChannelSpec()` | The notification channel (id, name, priority) the notification is posted to |
 | `defaultSmallIcon` | System default icon | Small icon resource for the notification (Android only) |
+| `requestPermission` | See [Notification Permission](#notification-permission) | Whether Ferret prompts for `POST_NOTIFICATIONS` itself, instead of leaving it entirely to your app |
+
+---
+
+### Data retention
+
+Controls how long captured networkRecords stay in Ferret's local Room database before older entries are automatically purged.
+
+```kotlin
+FerretConfiguration(
+    retentionDurationHours = 24 // keep the last 24 hours of captured traffic, purge anything older
+)
+```
+
+| Property | Description |
+|---|---|
+| `retentionDurationHours` | Number of hours of captured networkRecords to retain in the local database; entries older than this are cleared automatically |
  
 ---
 
 <a id="notification-permission"></a>
 ## Notification Permission 🔔
 
-Starting with Android 13, apps need to request `android.permission.POST_NOTIFICATIONS` at runtime to show notifications. Ferret keeps capturing traffic even without it, but the rolling notification won't appear until the permission is granted.
 
-Ferret does **not** request this permission itself, it only declares the permission in its manifest. Your app is responsible for requesting it at runtime, the same way you would for any of your own notifications (e.g. `ActivityCompat.requestPermissions` or the `rememberLauncherForActivityResult` Compose API).
+Starting with Android 13, apps need `android.permission.POST_NOTIFICATIONS` granted at runtime to show notifications. Ferret keeps capturing traffic even without it, but the rolling notification won't appear until the permission is granted.
 
-- If your app already requests notification permission for its own features, no extra work is needed. Ferret will start showing its notification as soon as the permission is granted.
-- If your app doesn't otherwise send notifications, add a runtime permission request somewhere in your app (e.g. on first launch or from a settings/debug screen) so `POST_NOTIFICATIONS` gets granted. Until then, capture and the in-app inspector still work fine, you can reach it via the home-screen shortcut regardless of notification permission.
+By default (`requestPermission = false`), Ferret only declares the permission in its manifest and leaves requesting it up to your app, the same way you'd request it for any of your own notifications (e.g. `ActivityCompat.requestPermissions` or the `rememberLauncherForActivityResult` Compose API).
 
----
+If you'd rather not wire that up yourself, set `requestPermission = true` on `NotificationConfiguration` (see [Configure](#configure)) and Ferret will show its own dialog asking for `POST_NOTIFICATIONS`:
+
+```kotlin
+configuration = FerretConfiguration(
+    notifications = NotificationConfiguration(
+        requestPermission = true
+    )
+)
+```
 
 <a id="sample-app"></a>
 ## Sample App 📱
