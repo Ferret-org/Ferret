@@ -1,19 +1,34 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.ferret.ui
 
 import com.ferret.FerretSdk
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCAction
+import platform.Foundation.NSSelectorFromString
 import platform.UIKit.UIAlertAction
 import platform.UIKit.UIAlertActionStyleDefault
 import platform.UIKit.UIAlertController
 import platform.UIKit.UIAlertControllerStyleAlert
 import platform.UIKit.UIApplication
+import platform.UIKit.UIBarButtonItem
+import platform.UIKit.UIBarButtonItemStyle
+import platform.UIKit.UIImage
+import platform.UIKit.UIModalPresentationFullScreen
 import platform.UIKit.UINavigationController
 import platform.UIKit.UISceneActivationStateForegroundActive
+import platform.UIKit.UISceneActivationStateForegroundInactive
 import platform.UIKit.UITabBarController
 import platform.UIKit.UIViewController
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
+import platform.UIKit.navigationItem
+import platform.darwin.NSObject
 
 internal object FerretIosUi {
+
+    // Held to prevent UIBarButtonItem from losing its weak target reference
+    private var closeButtonHandler: CloseButtonHandler? = null
 
     fun open() {
         val presenter = findTopViewController()
@@ -24,11 +39,22 @@ internal object FerretIosUi {
             return
         }
 
-        val ferretViewController =
-            ferretViewController()
+        val ferretVc = ferretViewController()
+        val navController = UINavigationController(rootViewController = ferretVc)
+        navController.modalPresentationStyle = UIModalPresentationFullScreen
+
+        val handler = CloseButtonHandler(navController)
+        closeButtonHandler = handler
+
+        ferretVc.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            image = UIImage.systemImageNamed("chevron.left"),
+            style = UIBarButtonItemStyle.UIBarButtonItemStylePlain,
+            target = handler,
+            action = NSSelectorFromString("onClose"),
+        )
 
         presenter.presentViewController(
-            viewControllerToPresent = ferretViewController,
+            viewControllerToPresent = navController,
             animated = true,
             completion = null,
         )
@@ -66,8 +92,8 @@ internal object FerretIosUi {
                 scene as? UIWindowScene
             }
             .firstOrNull { scene ->
-                scene.activationState ==
-                        UISceneActivationStateForegroundActive
+                scene.activationState == UISceneActivationStateForegroundActive ||
+                        scene.activationState == UISceneActivationStateForegroundInactive
             }
             ?: return null
 
@@ -84,6 +110,7 @@ internal object FerretIosUi {
         return window.rootViewController
             ?.topViewController()
     }
+
     private fun UIViewController.topViewController(): UIViewController {
         presentedViewController?.let { presented ->
             return presented.topViewController()
@@ -104,5 +131,14 @@ internal object FerretIosUi {
         }
 
         return this
+    }
+}
+
+private class CloseButtonHandler(
+    private val navController: UINavigationController,
+) : NSObject() {
+    @ObjCAction
+    fun onClose() {
+        navController.dismissViewControllerAnimated(true, completion = null)
     }
 }
