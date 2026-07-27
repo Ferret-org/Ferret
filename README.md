@@ -21,6 +21,7 @@
 
 - [Getting Started 👣](#getting-started)
 - [Features 🧰](#features)
+- [Demo](#demo)
 - [Android Setup 🤖](#android-setup)
 - [iOS Setup 🍎](#ios-setup)
 - [Using the Inspector 🔍](#using-the-inspector)
@@ -77,6 +78,33 @@ These are the versions Ferret is built and tested with. Kotlin is confirmed to w
 | Android `minSdk` | 28 |
 | Android `compileSdk` / `targetSdk` | 37 |
 Your project must already use Ktor for networking, Ferret plugs into `HttpClient` directly.
+
+---
+
+
+<a id="demo"></a>
+## Demo 🎥
+ 
+Screen recording in action, capturing a debugging session alongside the network activity that caused it:
+ 
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td align="center">
+    
+**Android**
+ 
+https://github.com/user-attachments/assets/23904ef4-290e-4d3b-9dcc-e92d473f6beb
+ 
+</td>
+<td align="center">
+    
+**iOS**
+ 
+https://github.com/user-attachments/assets/df14c805-98ef-4c4e-b1c1-8a991180a459
+ 
+</td>
+</tr>
+</table>
 
 ---
 
