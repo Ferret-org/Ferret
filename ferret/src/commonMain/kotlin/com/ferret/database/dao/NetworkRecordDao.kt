@@ -20,7 +20,8 @@ interface NetworkRecordDao {
     @Delete
     suspend fun delete(entity: NetworkRecordEntity)
 
-    @Query("""
+    @Query(
+        """
         UPDATE ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         SET responseDate         = :responseDate,
             tookMs               = :tookMs,
@@ -34,7 +35,8 @@ interface NetworkRecordDao {
             responseTlsVersion   = :responseTlsVersion,
             responseCipherSuite  = :responseCipherSuite
         WHERE id = :id
-    """)
+    """
+    )
     suspend fun updateResponse(
         id: Long,
         responseDate: Long,
@@ -50,13 +52,15 @@ interface NetworkRecordDao {
         responseCipherSuite: String?,
     )
 
-    @Query("""
+    @Query(
+        """
         UPDATE ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         SET responseDate = :responseDate,
             tookMs       = :tookMs,
             error        = :error
         WHERE id = :id
-    """)
+    """
+    )
     suspend fun updateError(
         id: Long,
         responseDate: Long,
@@ -67,27 +71,38 @@ interface NetworkRecordDao {
     @Query("DELETE FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}")
     suspend fun clear()
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         ORDER BY requestDate DESC
-    """)
+    """
+    )
     fun observeAll(): Flow<List<NetworkRecordEntity>>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         WHERE id = :id
-    """)
+    """
+    )
     suspend fun getById(id: Long): NetworkRecordEntity?
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         ORDER BY requestDate DESC
-    """)
+    """
+    )
     suspend fun getAll(): List<NetworkRecordEntity>
 
-    @Query("""
+    @Query(""" SELECT * FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE} ORDER BY requestDate DESC LIMIT :limit OFFSET :offset """)
+    suspend fun getPage(limit: Int, offset: Int): List<NetworkRecordEntity>
+
+    @Query(
+        """
         DELETE FROM ${com.ferret.database.DatabaseConstants.NETWORK_RECORD_TABLE}
         WHERE requestDate < :timestamp
-    """)
+    """
+    )
     suspend fun deleteOlderThan(timestamp: Long)
 }

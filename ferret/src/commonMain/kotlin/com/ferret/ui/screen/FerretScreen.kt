@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -57,21 +56,26 @@ fun FerretNetworkListScreen(
     val ferretState by ferretViewModel.ferretState.collectAsStateWithLifecycle()
     val query by ferretViewModel.searchQuery.collectAsStateWithLifecycle()
 
-    var showDeleteDialog by rememberSaveable() { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
 
     LaunchedEffect(listState) {
         snapshotFlow {
-            val layoutInfo = listState.layoutInfo
-            val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalItems = layoutInfo.totalItemsCount
-            lastVisibleIndex to totalItems
+            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
         }
             .distinctUntilChanged()
-            .collect { (lastVisibleIndex, totalItems) ->
-                if (totalItems > 0 && lastVisibleIndex >= totalItems - 5) {
-                    ferretViewModel.loadMoreSessions()
+            .collect { lastVisibleIndex ->
+
+                val totalItems = listState.layoutInfo.totalItemsCount
+
+                if (
+                    lastVisibleIndex != null &&
+                    lastVisibleIndex >= totalItems - 5 &&
+                    ferretState.hasMore &&
+                    !ferretState.isLoading
+                ) {
+                    ferretViewModel.loadMoreRecords()
                 }
             }
     }

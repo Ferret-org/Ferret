@@ -41,5 +41,7 @@ interface NetworkRecordRepository {
 
     fun observeAll(): Flow<List<NetworkRecord>>
 
+    suspend fun getPage(limit: Int, offset: Int): List<NetworkRecord>
+
     suspend fun deleteOlderThan(timestamp: Long)
 }

@@ -147,16 +147,6 @@ fun FerretBodyCard(
         else formatBody(body = body, contentType = contentType)
     }
 
-    val displayBody = remember(formattedBody) {
-        if (formattedBody.length > MAX_BODY_PREVIEW_LENGTH) {
-            formattedBody.take(MAX_BODY_PREVIEW_LENGTH)
-        } else {
-            formattedBody
-        }
-    }
-
-    val isTruncated = formattedBody.length > MAX_BODY_PREVIEW_LENGTH
-
     FerretCard(
         modifier = modifier.fillMaxWidth(),
         elevation = 3.dp,
@@ -196,21 +186,12 @@ fun FerretBodyCard(
         ) {
             SelectionContainer {
                 Text(
-                    text = displayBody,
+                    text = formattedBody,
                     style = FerretTypography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                     color = MaterialTheme.colorScheme.onSurface,
                     softWrap = false,
                 )
             }
-        }
-
-        if (isTruncated) {
-            Text(
-                modifier = Modifier.padding(top = 12.dp),
-                text = "Response truncated for preview",
-                style = FerretTypography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
