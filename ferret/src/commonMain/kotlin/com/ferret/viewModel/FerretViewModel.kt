@@ -16,14 +16,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 class FerretViewModel(
     private val getTransactionUseCase: GetNetworkRecordUseCase,
@@ -31,99 +27,133 @@ class FerretViewModel(
 ) : ViewModel() {
 
     private companion object {
-        const val PAGE_SIZE = 5
+        const val PAGE_SIZE = 25
     }
 
     private val selectedTab = MutableStateFlow(FerretTab.ALL)
 
     private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    val searchQuery: StateFlow<String> =
-        _searchQuery.asStateFlow()
+    private val _records = MutableStateFlow<List<NetworkRecord>>(emptyList())
 
-    private val visibleSessionCount = MutableStateFlow(PAGE_SIZE)
+    private val _isLoading = MutableStateFlow(false)
+
+    private val _hasMore = MutableStateFlow(true)
+
+    private var offset = 0
+
+    init {
+        loadInitialRecords()
+    }
 
     fun selectTab(tab: FerretTab) {
+        if (selectedTab.value == tab) return
+
         selectedTab.value = tab
-        visibleSessionCount.value = PAGE_SIZE
+        resetPagination()
     }
 
     fun onSearchQueryChanged(query: String) {
+        if (_searchQuery.value == query) return
+
         _searchQuery.value = query
-        visibleSessionCount.value = PAGE_SIZE
+        resetPagination()
     }
 
-    fun loadMoreSessions() {
-        visibleSessionCount.value += PAGE_SIZE
+    private fun resetPagination() {
+        offset = 0
+        _records.value = emptyList()
+        _hasMore.value = true
+
+        loadInitialRecords()
     }
 
-    @OptIn(FlowPreview::class)
-    val ferretState = combine(
-        getTransactionUseCase(),
-        selectedTab,
-        _searchQuery
-            .debounce(300.milliseconds)
-            .distinctUntilChanged(),
-        visibleSessionCount,
-    ) { networkRecords, tab, query, visibleCount ->
+    private fun loadInitialRecords() {
+        if (_isLoading.value) return
 
-        val filteredByTab = when (tab) {
-            FerretTab.ALL -> {
-                networkRecords
-            }
+        viewModelScope.launch {
+            _isLoading.value = true
 
-            FerretTab.HTTP -> {
-                networkRecords.filter { !it.isWebSocket }
-            }
+            try {
+                val records = getTransactionUseCase(
+                    limit = PAGE_SIZE,
+                    offset = 0,
+                )
 
-            FerretTab.WEBSOCKET -> {
-                networkRecords.filter { it.isWebSocket }
+                _records.value = records
+                offset = records.size
+                _hasMore.value = records.size == PAGE_SIZE
+            } finally {
+                _isLoading.value = false
             }
         }
+    }
 
-        val filteredRecords = if (query.isBlank()) {
-            filteredByTab
-        } else {
-            filteredByTab.filter { networkRecord ->
-                networkRecord.method
-                    .orEmpty()
-                    .contains(query, ignoreCase = true) ||
-                        networkRecord.host
-                            .contains(query, ignoreCase = true) ||
-                        networkRecord.path
-                            .contains(query, ignoreCase = true) ||
-                        networkRecord.url
-                            .contains(query, ignoreCase = true)
-            }
-        }
+    fun loadMoreRecords() {
+        if (_isLoading.value || !_hasMore.value) return
 
-        val allSessions = filteredRecords
-            .groupBy { it.sessionId }
-            .map { (sessionId, records) ->
-                val sortedRecords = records.sortedByDescending {
-                    it.requestDate
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                val records = getTransactionUseCase(
+                    limit = PAGE_SIZE,
+                    offset = offset,
+                )
+
+                if (records.isEmpty()) {
+                    _hasMore.value = false
+                    return@launch
                 }
 
-                NetworkSession(
-                    sessionId = sessionId,
-                    records = sortedRecords,
-                    latestRequestDate = sortedRecords
-                        .first()
-                        .requestDate,
-                )
-            }
-            .sortedByDescending {
-                it.latestRequestDate
-            }
+                _records.update { current ->
+                    current + records
+                }
 
-        val pagedSessions = allSessions.take(visibleCount)
+                offset += records.size
+
+                _hasMore.value = records.size == PAGE_SIZE
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    val ferretState: StateFlow<FerretUiState> = combine(
+        _records,
+        selectedTab,
+        _searchQuery,
+        _isLoading,
+        _hasMore,
+    ) { records, tab, query, isLoading, hasMore ->
+
+        val filteredRecords = records.filter { record ->
+            record.matches(
+                tab = tab,
+                query = query,
+            )
+        }
+
+        val sessions = filteredRecords.groupBy { it.sessionId }.map { (sessionId, records) ->
+
+            val sortedRecords = records.sortedByDescending { it.requestDate }
+
+            NetworkSession(
+                sessionId = sessionId,
+                records = sortedRecords,
+                latestRequestDate = sortedRecords.first().requestDate,
+            )
+        }.sortedByDescending {
+            it.latestRequestDate
+        }
 
         FerretUiState(
             selectedTab = tab,
             searchQuery = query,
-            sessions = pagedSessions,
-            hasMore = allSessions.size > pagedSessions.size,
-            isLoading = false
+            sessions = sessions,
+            hasMore = hasMore,
+            isLoading = isLoading,
         )
     }.onStart {
         emit(FerretUiState(isLoading = true))
@@ -136,9 +166,51 @@ class FerretViewModel(
     fun clearDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             clearDatabaseUseCase()
+
+            offset = 0
+            _records.value = emptyList()
+            _hasMore.value = false
         }
     }
 }
+
+private fun NetworkRecord.matches(
+    tab: FerretTab,
+    query: String,
+): Boolean {
+
+    val matchesTab = when (tab) {
+        FerretTab.ALL -> true
+        FerretTab.HTTP -> !isWebSocket
+        FerretTab.WEBSOCKET -> isWebSocket
+    }
+
+    if (!matchesTab) return false
+
+    if (query.isBlank()) return true
+
+    return matchesQuery(query)
+}
+
+private fun NetworkRecord.matchesQuery(
+    query: String,
+): Boolean {
+    return method.orEmpty().contains(query, ignoreCase = true) ||
+
+            host.contains(query, ignoreCase = true) ||
+
+            path.contains(query, ignoreCase = true) ||
+
+            url.contains(query, ignoreCase = true) ||
+
+            if (isWebSocket) {
+                requestBody.orEmpty().contains(query, ignoreCase = true) ||
+                        responseBody.orEmpty().contains(query, ignoreCase = true)
+            } else {
+                false
+            }
+}
+
 
 data class FerretUiState(
     val selectedTab: FerretTab = FerretTab.ALL,

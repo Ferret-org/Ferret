@@ -82,6 +82,12 @@ internal class NetworkRecordRepositoryImpl(
             .onStart { dao.deleteOlderThan(cutoffTimestamp()) }
             .map { list -> list.map(NetworkRecordEntity::toDomain) }
 
+    override suspend fun getPage(limit: Int, offset: Int): List<NetworkRecord> {
+        dao.deleteOlderThan(cutoffTimestamp())
+        return dao.getPage(limit = limit, offset = offset)
+            .map(NetworkRecordEntity::toDomain)
+    }
+
     override suspend fun deleteOlderThan(timestamp: Long) =
         dao.deleteOlderThan(timestamp)
 
