@@ -10,7 +10,7 @@ data class FerretConfiguration(
 
 data class NotificationConfiguration(
     val maxBufferSize: Int = 5,
-    val defaultPriority: NotificationPriority = NotificationPriority.LOW,
+    val defaultPriority: NotificationPriority = NotificationPriority.MIN,
     val defaultChannel: NotificationChannelSpec = NotificationChannelSpec(),
     val defaultSmallIcon: Int = 0,
     val requestPermission: Boolean = false
